@@ -1,0 +1,60 @@
+// File generated from our OpenAPI spec by Stainless.
+
+package com.apologist.api.services
+
+import com.apologist.api.client.ApologistClient
+import com.apologist.api.client.okhttp.ApologistOkHttpClient
+import com.apologist.api.models.pet.Pet
+import com.github.tomakehurst.wiremock.client.WireMock.anyUrl
+import com.github.tomakehurst.wiremock.client.WireMock.equalTo
+import com.github.tomakehurst.wiremock.client.WireMock.ok
+import com.github.tomakehurst.wiremock.client.WireMock.put
+import com.github.tomakehurst.wiremock.client.WireMock.putRequestedFor
+import com.github.tomakehurst.wiremock.client.WireMock.stubFor
+import com.github.tomakehurst.wiremock.client.WireMock.verify
+import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo
+import com.github.tomakehurst.wiremock.junit5.WireMockTest
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.parallel.ResourceLock
+
+@WireMockTest
+@ResourceLock("https://github.com/wiremock/wiremock/issues/169")
+internal class ServiceParamsTest {
+
+    private lateinit var client: ApologistClient
+
+    @BeforeEach
+    fun beforeEach(wmRuntimeInfo: WireMockRuntimeInfo) {
+        client =
+            ApologistOkHttpClient.builder()
+                .baseUrl(wmRuntimeInfo.httpBaseUrl)
+                .apiKey("My API Key")
+                .build()
+    }
+
+    @Disabled("Prism tests are disabled")
+    @Test
+    fun update() {
+        val petService = client.pet()
+        stubFor(put(anyUrl()).willReturn(ok("{}")))
+
+        petService.update(
+            Pet.builder()
+                .name("doggie")
+                .addPhotoUrl("string")
+                .id(10L)
+                .category(Pet.Category.builder().id(1L).name("Dogs").build())
+                .status(Pet.Status.AVAILABLE)
+                .addTag(Pet.Tag.builder().id(0L).name("name").build())
+                .build()
+        )
+
+        verify(
+            putRequestedFor(anyUrl())
+                .withHeader("Secret-Header", equalTo("42"))
+                .withQueryParam("secret_query_param", equalTo("42"))
+        )
+    }
+}
