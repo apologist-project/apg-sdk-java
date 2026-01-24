@@ -5,6 +5,7 @@ package com.apologist.api.services
 import com.apologist.api.client.ApologistClient
 import com.apologist.api.client.okhttp.ApologistOkHttpClient
 import com.apologist.api.models.pet.Pet
+import com.apologist.api.models.pet.PetUpdateParams
 import com.github.tomakehurst.wiremock.client.WireMock.anyUrl
 import com.github.tomakehurst.wiremock.client.WireMock.equalTo
 import com.github.tomakehurst.wiremock.client.WireMock.ok
@@ -41,13 +42,19 @@ internal class ServiceParamsTest {
         stubFor(put(anyUrl()).willReturn(ok("{}")))
 
         petService.update(
-            Pet.builder()
-                .name("doggie")
-                .addPhotoUrl("string")
-                .id(10L)
-                .category(Pet.Category.builder().id(1L).name("Dogs").build())
-                .status(Pet.Status.AVAILABLE)
-                .addTag(Pet.Tag.builder().id(0L).name("name").build())
+            PetUpdateParams.builder()
+                .pet(
+                    Pet.builder()
+                        .name("doggie")
+                        .addPhotoUrl("string")
+                        .id(10L)
+                        .category(Pet.Category.builder().id(1L).name("Dogs").build())
+                        .status(Pet.Status.AVAILABLE)
+                        .addTag(Pet.Tag.builder().id(0L).name("name").build())
+                        .build()
+                )
+                .putAdditionalHeader("Secret-Header", "42")
+                .putAdditionalQueryParam("secret_query_param", "42")
                 .build()
         )
 
