@@ -43,9 +43,9 @@ java {
 }
 
 
-group = 'ai.apologist'
+group = 'com.apologist'
 
-version = '0.0.4'
+version = '0.0.5'
 
 jar {
     dependsOn(":generatePomFileForMavenPublication")
@@ -70,9 +70,9 @@ test {
 publishing {
     publications {
         maven(MavenPublication) {
-            groupId = 'ai.apologist'
+            groupId = 'com.apologist'
             artifactId = 'apologist'
-            version = '0.0.4'
+            version = '0.0.5'
             from components.java
             pom {
                 licenses {
