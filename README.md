@@ -1,65 +1,88 @@
-# Apologist Java API Library
+# ApologistAi Java Library
 
-<!-- x-release-please-start-version -->
+[![fern shield](https://img.shields.io/badge/%F0%9F%8C%BF-Built%20with%20Fern-brightgreen)](https://buildwithfern.com?utm_source=github&utm_medium=github&utm_campaign=readme&utm_source=https%3A%2F%2Fgithub.com%2Fapologist-project%2Fapg-sdk-java)
+[![Maven Central](https://img.shields.io/maven-central/v/ai.apologist/apologist)](https://central.sonatype.com/artifact/ai.apologist/apologist)
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.apologist.api/apologist-java)](https://central.sonatype.com/artifact/com.apologist.api/apologist-java/0.0.2)
-[![javadoc](https://javadoc.io/badge2/com.apologist.api/apologist-java/0.0.2/javadoc.svg)](https://javadoc.io/doc/com.apologist.api/apologist-java/0.0.2)
+The ApologistAi Java library provides convenient access to the ApologistAi APIs from Java.
 
-<!-- x-release-please-end -->
+## Table of Contents
 
-The Apologist Java SDK provides convenient access to the Apologist REST API from applications written in Java.
-
-It is generated with [Stainless](https://www.stainless.com/).
-
-<!-- x-release-please-start-version -->
-
-Javadocs are available on [javadoc.io](https://javadoc.io/doc/com.apologist.api/apologist-java/0.0.2).
-
-<!-- x-release-please-end -->
+- [Installation](#installation)
+- [Requirements](#requirements)
+- [Reference](#reference)
+- [Usage](#usage)
+- [Client Configuration](#client-configuration)
+- [Requests and Responses](#requests-and-responses)
+- [Immutability](#immutability)
+- [Asynchronous Execution](#asynchronous-execution)
+- [Raw Responses](#raw-responses)
+- [Error Handling](#error-handling)
+- [Logging](#logging)
+- [Pro Guard and R 8](#pro-guard-and-r-8)
+- [Jackson](#jackson)
+- [Network Options](#network-options)
+- [Undocumented Api Functionality](#undocumented-api-functionality)
+- [Faq](#faq)
+- [Semantic Versioning](#semantic-versioning)
+- [Environments](#environments)
+- [Base Url](#base-url)
+- [Exception Handling](#exception-handling)
+- [Advanced](#advanced)
+  - [Custom Client](#custom-client)
+  - [Retries](#retries)
+  - [Timeouts](#timeouts)
+  - [Custom Headers](#custom-headers)
+  - [Access Raw Response Data](#access-raw-response-data)
+- [Contributing](#contributing)
 
 ## Installation
 
-<!-- x-release-please-start-version -->
-
 ### Gradle
 
-```kotlin
-implementation("com.apologist.api:apologist-java:0.0.2")
+Add the dependency in your `build.gradle` file:
+
+```groovy
+dependencies {
+  implementation 'ai.apologist:apologist:0.0.3'
+}
 ```
 
 ### Maven
 
+Add the dependency in your `pom.xml` file:
+
 ```xml
 <dependency>
-  <groupId>com.apologist.api</groupId>
-  <artifactId>apologist-java</artifactId>
-  <version>0.0.2</version>
+  <groupId>ai.apologist</groupId>
+  <artifactId>apologist</artifactId>
+  <version>0.0.3</version>
 </dependency>
 ```
-
-<!-- x-release-please-end -->
 
 ## Requirements
 
 This library requires Java 8 or later.
 
+## Reference
+
+A full reference for this library is available [here](https://github.com/apologist-project/apg-sdk-java/blob/HEAD/./reference.md).
+
 ## Usage
 
+Instantiate and use the client with the following:
+
 ```java
-import com.apologist.api.client.ApologistClient;
-import com.apologist.api.client.okhttp.ApologistOkHttpClient;
-import com.apologist.api.models.pet.Pet;
-import com.apologist.api.models.pet.PetUpdateParams;
+package com.example.usage;
 
-// Configures using the `apologist.apiKey` and `apologist.baseUrl` system properties
-// Or configures using the `APOLOGIST_API_KEY` and `APOLOGIST_BASE_URL` environment variables
-ApologistClient client = ApologistOkHttpClient.fromEnv();
+import com.apologist.ai.api.ApologistAiApiClient;
 
-Pet params = Pet.builder()
-    .name("doggie")
-    .addPhotoUrl("string")
+ApologistAiApiClient client = ApologistAiApiClient
+    .builder()
+    .apiKey("<api-key>")
+    .domain("YOUR_DOMAIN")
     .build();
-Pet pet = client.pet().update(params);
+
+client.chat().createChatCompletion(...);
 ```
 
 ## Client configuration
@@ -627,3 +650,168 @@ This package generally follows [SemVer](https://semver.org/spec/v2.0.0.html) con
 We take backwards-compatibility seriously and work hard to ensure you can rely on a smooth upgrade experience.
 
 We are keen for your feedback; please open an [issue](https://www.github.com/apologist-project/apg-sdk-java/issues) with questions, bugs, or suggestions.
+
+## Environments
+
+This SDK allows you to configure different environments for API requests.
+
+```java
+import com.apologist.ai.api.ApologistAiApiClient;
+import com.apologist.ai.api.core.Environment;
+
+ApologistAiApiClient client = ApologistAiApiClient
+    .builder()
+    .environment(Environment.Default)
+    .build();
+```
+
+## Base Url
+
+You can set a custom base URL when constructing the client.
+
+```java
+import com.apologist.ai.api.ApologistAiApiClient;
+
+ApologistAiApiClient client = ApologistAiApiClient
+    .builder()
+    .url("https://example.com")
+    .build();
+```
+
+## Exception Handling
+
+When the API returns a non-success status code (4xx or 5xx response), an API exception will be thrown.
+
+```java
+import com.apologist.ai.api.core.ApologistAiApiApiException;
+
+try{
+    client.chat().createChatCompletion(...);
+} catch (ApologistAiApiApiException e){
+    // Do something with the API exception...
+}
+```
+
+## Advanced
+
+### Custom Client
+
+This SDK is built to work with any instance of `OkHttpClient`. By default, if no client is provided, the SDK will construct one.
+However, you can pass your own client like so:
+
+```java
+import com.apologist.ai.api.ApologistAiApiClient;
+import okhttp3.OkHttpClient;
+
+OkHttpClient customClient = ...;
+
+ApologistAiApiClient client = ApologistAiApiClient
+    .builder()
+    .httpClient(customClient)
+    .build();
+```
+
+### Retries
+
+The SDK is instrumented with automatic retries with exponential backoff. A request will be retried as long
+as the request is deemed retryable and the number of retry attempts has not grown larger than the configured
+retry limit (default: 2). Before defaulting to exponential backoff, the SDK will first attempt to respect
+the `Retry-After` header (as either in seconds or as an HTTP date), and then the `X-RateLimit-Reset` header
+(as a Unix timestamp in epoch seconds); failing both of those, it will fall back to exponential backoff.
+
+Which status codes are retried depends on the `retry-status-codes` generator configuration:
+
+**`legacy`** (current default): retries on
+- [408](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/408) (Timeout)
+- [429](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429) (Too Many Requests)
+- [5XX](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status#server_error_responses) (All server errors, including 500)
+
+**`recommended`**: retries on
+- [408](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/408) (Timeout)
+- [429](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429) (Too Many Requests)
+- [502](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/502) (Bad Gateway)
+- [503](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/503) (Service Unavailable)
+- [504](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/504) (Gateway Timeout)
+
+Use the `maxRetries` client option to configure this behavior.
+
+```java
+import com.apologist.ai.api.ApologistAiApiClient;
+
+ApologistAiApiClient client = ApologistAiApiClient
+    .builder()
+    .maxRetries(1)
+    .build();
+```
+
+### Timeouts
+
+The SDK defaults to a 60 second timeout. You can configure this with a timeout option at the client or request level.
+```java
+import com.apologist.ai.api.ApologistAiApiClient;
+import com.apologist.ai.api.core.RequestOptions;
+
+// Client level
+ApologistAiApiClient client = ApologistAiApiClient
+    .builder()
+    .timeout(60)
+    .build();
+
+// Request level
+client.chat().createChatCompletion(
+    ...,
+    RequestOptions
+        .builder()
+        .timeout(60)
+        .build()
+);
+```
+
+### Custom Headers
+
+The SDK allows you to add custom headers to requests. You can configure headers at the client level or at the request level.
+
+```java
+import com.apologist.ai.api.ApologistAiApiClient;
+import com.apologist.ai.api.core.RequestOptions;
+
+// Client level
+ApologistAiApiClient client = ApologistAiApiClient
+    .builder()
+    .addHeader("X-Custom-Header", "custom-value")
+    .addHeader("X-Request-Id", "abc-123")
+    .build();
+;
+
+// Request level
+client.chat().createChatCompletion(
+    ...,
+    RequestOptions
+        .builder()
+        .addHeader("X-Request-Header", "request-value")
+        .build()
+);
+```
+
+### Access Raw Response Data
+
+The SDK provides access to raw response data, including headers, through the `withRawResponse()` method.
+The `withRawResponse()` method returns a raw client that wraps all responses with `body()` and `headers()` methods.
+(A normal client's `response` is identical to a raw client's `response.body()`.)
+
+```java
+ApologistAiApiHttpResponse response = client.chat().withRawResponse().createChatCompletion(...);
+
+System.out.println(response.body());
+System.out.println(response.headers().get("X-My-Header"));
+```
+
+## Contributing
+
+While we value open-source contributions to this SDK, this library is generated programmatically.
+Additions made directly to this library would have to be moved over to our generation code,
+otherwise they would be overwritten upon the next generated release. Feel free to open a PR as
+a proof of concept, but know that we will not be able to merge it as-is. We suggest opening
+an issue first to discuss with us!
+
+On the other hand, contributions to the README are always very welcome!
