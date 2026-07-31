@@ -212,8 +212,7 @@ public class RawChannelsClient {
     /**
      * Handles the Meta webhook verification handshake, echoing <code>hub.challenge</code> when <code>hub.verify_token</code> matches the channel's configured token.
      */
-    public AgentClientHttpResponse<String> verifyFacebookWebhook(
-            String id, VerifyFacebookWebhookRequest request) {
+    public AgentClientHttpResponse<String> verifyFacebookWebhook(String id, VerifyFacebookWebhookRequest request) {
         return verifyFacebookWebhook(id, request, null);
     }
 
@@ -291,8 +290,7 @@ public class RawChannelsClient {
     /**
      * Receives Facebook/Messenger (and Instagram-style) message events for the channel. Payload shape is defined by Meta.
      */
-    public AgentClientHttpResponse<Void> receiveFacebookMessage(
-            String id, ReceiveFacebookMessageRequest request) {
+    public AgentClientHttpResponse<Void> receiveFacebookMessage(String id, ReceiveFacebookMessageRequest request) {
         return receiveFacebookMessage(id, request, null);
     }
 
@@ -377,8 +375,7 @@ public class RawChannelsClient {
     /**
      * Returns a static HTML privacy policy page for the Instagram integration.
      */
-    public AgentClientHttpResponse<String> getInstagramPrivacyPolicy(
-            String id, RequestOptions requestOptions) {
+    public AgentClientHttpResponse<String> getInstagramPrivacyPolicy(String id, RequestOptions requestOptions) {
         return getInstagramPrivacyPolicy(
                 id, GetInstagramPrivacyPolicyRequest.builder().build(), requestOptions);
     }
@@ -444,8 +441,7 @@ public class RawChannelsClient {
     /**
      * Receives Telegram bot update events for the channel. Non-message updates are acknowledged and ignored. Payload shape is defined by Telegram.
      */
-    public AgentClientHttpResponse<Void> receiveTelegramUpdate(
-            String id, ReceiveTelegramUpdateRequest request) {
+    public AgentClientHttpResponse<Void> receiveTelegramUpdate(String id, ReceiveTelegramUpdateRequest request) {
         return receiveTelegramUpdate(id, request, null);
     }
 

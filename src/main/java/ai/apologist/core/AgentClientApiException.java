@@ -67,7 +67,7 @@ public class AgentClientApiException extends AgentClientException {
 
     @Override
     public String toString() {
-        return "AgentClientApiException{" + "message: " + getMessage() + ", statusCode: " + statusCode
-                + ", body: " + ObjectMappers.stringify(body) + "}";
+        return "AgentClientApiException{" + "message: " + getMessage() + ", statusCode: " + statusCode + ", body: "
+                + ObjectMappers.stringify(body) + "}";
     }
 }

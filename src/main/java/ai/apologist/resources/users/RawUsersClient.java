@@ -339,8 +339,7 @@ public class RawUsersClient {
     /**
      * Updates a user's external_id and/or tags and upserts the persisted responder for the agent. Only provided fields are changed.
      */
-    public AgentClientHttpResponse<UpdateUserResponse> updateUser(
-            String userId, RequestOptions requestOptions) {
+    public AgentClientHttpResponse<UpdateUserResponse> updateUser(String userId, RequestOptions requestOptions) {
         return updateUser(userId, UserUpdateRequest.builder().build(), requestOptions);
     }
 

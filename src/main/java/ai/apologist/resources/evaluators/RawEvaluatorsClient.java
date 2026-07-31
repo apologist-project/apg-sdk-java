@@ -51,16 +51,14 @@ public class RawEvaluatorsClient {
     /**
      * Returns a paginated list of evaluations for the evaluator, scoped to the requesting agent.
      */
-    public AgentClientHttpResponse<ListEvaluationsResponse> listEvaluations(
-            String id, RequestOptions requestOptions) {
+    public AgentClientHttpResponse<ListEvaluationsResponse> listEvaluations(String id, RequestOptions requestOptions) {
         return listEvaluations(id, ListEvaluationsRequest.builder().build(), requestOptions);
     }
 
     /**
      * Returns a paginated list of evaluations for the evaluator, scoped to the requesting agent.
      */
-    public AgentClientHttpResponse<ListEvaluationsResponse> listEvaluations(
-            String id, ListEvaluationsRequest request) {
+    public AgentClientHttpResponse<ListEvaluationsResponse> listEvaluations(String id, ListEvaluationsRequest request) {
         return listEvaluations(id, request, null);
     }
 
@@ -185,8 +183,7 @@ public class RawEvaluatorsClient {
     /**
      * Runs an evaluation on the provided content using the specified evaluator
      */
-    public AgentClientHttpResponse<EvaluateContentResponse> evaluateContent(
-            String id, EvaluatorRequest request) {
+    public AgentClientHttpResponse<EvaluateContentResponse> evaluateContent(String id, EvaluatorRequest request) {
         return evaluateContent(id, request, null);
     }
 

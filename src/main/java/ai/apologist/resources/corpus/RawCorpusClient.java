@@ -123,8 +123,7 @@ public class RawCorpusClient {
     /**
      * Records that a user viewed a specific corpus item
      */
-    public AgentClientHttpResponse<SuccessResponse> logCorpusView(
-            String model, String id, ViewRequest request) {
+    public AgentClientHttpResponse<SuccessResponse> logCorpusView(String model, String id, ViewRequest request) {
         return logCorpusView(model, id, request, null);
     }
 

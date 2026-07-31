@@ -186,8 +186,7 @@ public class RawBenchmarksClient {
     /**
      * Executes a benchmark run and returns the aggregated result with nested evaluators, questions, and a flat evaluations array.
      */
-    public AgentClientHttpResponse<Map<String, Object>> runBenchmark(
-            String id, RequestOptions requestOptions) {
+    public AgentClientHttpResponse<Map<String, Object>> runBenchmark(String id, RequestOptions requestOptions) {
         return runBenchmark(id, BenchmarkRunRequest.builder().build(), requestOptions);
     }
 
