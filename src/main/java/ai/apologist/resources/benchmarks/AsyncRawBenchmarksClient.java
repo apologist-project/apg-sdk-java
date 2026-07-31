@@ -147,8 +147,7 @@ public class AsyncRawBenchmarksClient {
                                     requestOptions.getMaxRetries().get()))
                     .build();
         }
-        CompletableFuture<AgentClientHttpResponse<ListBenchmarkRunsResponse>> future =
-                new CompletableFuture<>();
+        CompletableFuture<AgentClientHttpResponse<ListBenchmarkRunsResponse>> future = new CompletableFuture<>();
         client.newCall(okhttpRequest).enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
@@ -190,15 +189,13 @@ public class AsyncRawBenchmarksClient {
                     future.completeExceptionally(
                             new AgentClientException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
-                    future.completeExceptionally(
-                            new AgentClientException("Network error executing HTTP request", e));
+                    future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
                 }
             }
 
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                future.completeExceptionally(
-                        new AgentClientException("Network error executing HTTP request", e));
+                future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
             }
         });
         return future;
@@ -321,15 +318,13 @@ public class AsyncRawBenchmarksClient {
                     future.completeExceptionally(
                             new AgentClientException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
-                    future.completeExceptionally(
-                            new AgentClientException("Network error executing HTTP request", e));
+                    future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
                 }
             }
 
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                future.completeExceptionally(
-                        new AgentClientException("Network error executing HTTP request", e));
+                future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
             }
         });
         return future;
@@ -435,15 +430,13 @@ public class AsyncRawBenchmarksClient {
                     future.completeExceptionally(
                             new AgentClientException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
-                    future.completeExceptionally(
-                            new AgentClientException("Network error executing HTTP request", e));
+                    future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
                 }
             }
 
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                future.completeExceptionally(
-                        new AgentClientException("Network error executing HTTP request", e));
+                future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
             }
         });
         return future;

@@ -48,8 +48,7 @@ public class AsyncRawCorpusClient {
     /**
      * Performs a semantic search across the agent's corpus of knowledge
      */
-    public CompletableFuture<AgentClientHttpResponse<SearchCorpusResponse>> searchCorpus(
-            CorpusSearchRequest request) {
+    public CompletableFuture<AgentClientHttpResponse<SearchCorpusResponse>> searchCorpus(CorpusSearchRequest request) {
         return searchCorpus(request, null);
     }
 
@@ -134,15 +133,13 @@ public class AsyncRawCorpusClient {
                     future.completeExceptionally(
                             new AgentClientException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
-                    future.completeExceptionally(
-                            new AgentClientException("Network error executing HTTP request", e));
+                    future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
                 }
             }
 
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                future.completeExceptionally(
-                        new AgentClientException("Network error executing HTTP request", e));
+                future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
             }
         });
         return future;
@@ -240,15 +237,13 @@ public class AsyncRawCorpusClient {
                     future.completeExceptionally(
                             new AgentClientException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
-                    future.completeExceptionally(
-                            new AgentClientException("Network error executing HTTP request", e));
+                    future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
                 }
             }
 
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                future.completeExceptionally(
-                        new AgentClientException("Network error executing HTTP request", e));
+                future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
             }
         });
         return future;
@@ -346,15 +341,13 @@ public class AsyncRawCorpusClient {
                     future.completeExceptionally(
                             new AgentClientException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
-                    future.completeExceptionally(
-                            new AgentClientException("Network error executing HTTP request", e));
+                    future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
                 }
             }
 
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                future.completeExceptionally(
-                        new AgentClientException("Network error executing HTTP request", e));
+                future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
             }
         });
         return future;
@@ -452,15 +445,13 @@ public class AsyncRawCorpusClient {
                     future.completeExceptionally(
                             new AgentClientException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
-                    future.completeExceptionally(
-                            new AgentClientException("Network error executing HTTP request", e));
+                    future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
                 }
             }
 
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                future.completeExceptionally(
-                        new AgentClientException("Network error executing HTTP request", e));
+                future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
             }
         });
         return future;
@@ -558,15 +549,13 @@ public class AsyncRawCorpusClient {
                     future.completeExceptionally(
                             new AgentClientException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
-                    future.completeExceptionally(
-                            new AgentClientException("Network error executing HTTP request", e));
+                    future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
                 }
             }
 
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                future.completeExceptionally(
-                        new AgentClientException("Network error executing HTTP request", e));
+                future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
             }
         });
         return future;

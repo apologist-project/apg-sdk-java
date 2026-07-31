@@ -56,8 +56,7 @@ public class RawChatClient {
     /**
      * Returns a paginated list of chat completions (prompts) for the agent, with applied tags expanded as { id, name } and share metadata.
      */
-    public AgentClientHttpResponse<ListChatCompletionsResponse> listChatCompletions(
-            RequestOptions requestOptions) {
+    public AgentClientHttpResponse<ListChatCompletionsResponse> listChatCompletions(RequestOptions requestOptions) {
         return listChatCompletions(ListChatCompletionsRequest.builder().build(), requestOptions);
     }
 
@@ -206,8 +205,7 @@ public class RawChatClient {
     /**
      * Creates a chat completion using the agent's configured model. Supports both streaming and non-streaming responses.
      */
-    public AgentClientHttpResponse<ChatCompletionResponse> createChatCompletion(
-            ChatCompletionRequest request) {
+    public AgentClientHttpResponse<ChatCompletionResponse> createChatCompletion(ChatCompletionRequest request) {
         return createChatCompletion(request, null);
     }
 

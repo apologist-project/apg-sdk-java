@@ -37,8 +37,7 @@ public class AsyncRawSharesClient {
     /**
      * Public, unauthenticated read of the messages behind a share token. The token is the bearer capability and enforces tenant isolation against the host agent. An empty or invalid token yields an empty messages array.
      */
-    public CompletableFuture<AgentClientHttpResponse<GetSharedMessagesResponse>> getSharedMessages(
-            String token) {
+    public CompletableFuture<AgentClientHttpResponse<GetSharedMessagesResponse>> getSharedMessages(String token) {
         return getSharedMessages(token, GetSharedMessagesRequest.builder().build());
     }
 
@@ -91,8 +90,7 @@ public class AsyncRawSharesClient {
                                     requestOptions.getMaxRetries().get()))
                     .build();
         }
-        CompletableFuture<AgentClientHttpResponse<GetSharedMessagesResponse>> future =
-                new CompletableFuture<>();
+        CompletableFuture<AgentClientHttpResponse<GetSharedMessagesResponse>> future = new CompletableFuture<>();
         client.newCall(okhttpRequest).enqueue(new Callback() {
             @Override
             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
@@ -129,15 +127,13 @@ public class AsyncRawSharesClient {
                     future.completeExceptionally(
                             new AgentClientException("Failed to deserialize response: " + e.getMessage(), e));
                 } catch (IOException e) {
-                    future.completeExceptionally(
-                            new AgentClientException("Network error executing HTTP request", e));
+                    future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
                 }
             }
 
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                future.completeExceptionally(
-                        new AgentClientException("Network error executing HTTP request", e));
+                future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
             }
         });
         return future;
