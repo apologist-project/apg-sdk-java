@@ -3,11 +3,11 @@
   "generatorName": "fernapi/fern-java-sdk",
   "generatorVersion": "4.16.0",
   "generatorConfig": {
-    "client-class-name": "ApologistClient",
-    "package-prefix": "com.apologist.api"
+    "client-class-name": "ApologistAgentClient",
+    "package-prefix": "com.apologist"
   },
-  "originGitCommit": "3d4615f7826341c73658f9175a71e5dc79049bde",
+  "originGitCommit": "48763009ddb15e043da173498c3cc160c5c5dc45",
   "originGitCommitIsDirty": true,
   "invokedBy": "manual",
-  "sdkVersion": "0.0.5"
+  "sdkVersion": "0.0.6"
 }
