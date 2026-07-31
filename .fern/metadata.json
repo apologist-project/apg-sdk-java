@@ -2,8 +2,12 @@
   "cliVersion": "5.72.1",
   "generatorName": "fernapi/fern-java-sdk",
   "generatorVersion": "4.16.0",
+  "generatorConfig": {
+    "client-class-name": "ApologistAgentClient",
+    "package-prefix": "ai.apologist"
+  },
   "originGitCommit": "bed785c05c5bfb53f26bc1e786c4361a189f15b4",
   "originGitCommitIsDirty": true,
   "invokedBy": "manual",
-  "sdkVersion": "0.0.3"
+  "sdkVersion": "0.0.4"
 }
