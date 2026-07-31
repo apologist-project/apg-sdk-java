@@ -1,14 +1,11 @@
 plugins {
     id 'java-library'
-    id 'maven-publish'
     id 'com.diffplug.spotless' version '6.11.0'
+    id 'com.vanniktech.maven.publish' version '0.34.0'
 }
 
 repositories {
     mavenCentral()
-    maven {
-        url 'https://s01.oss.sonatype.org/content/repositories/releases/'
-    }
 }
 
 dependencies {
@@ -20,7 +17,6 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.8.2'
 }
-
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -36,19 +32,15 @@ spotless {
     }
 }
 
-
 java {
     withSourcesJar()
     withJavadocJar()
 }
 
-
-group = 'com.apologist'
-
-version = '0.0.6'
+group = 'ai.apologist'
+version = '1.0.2'
 
 jar {
-    dependsOn(":generatePomFileForMavenPublication")
     archiveBaseName = "apologist"
 }
 
@@ -67,36 +59,35 @@ test {
     }
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'com.apologist'
-            artifactId = 'apologist'
-            version = '0.0.6'
-            from components.java
-            pom {
-                licenses {
-                    license {
-                        name = 'The MIT License (MIT)'
-                        url = 'https://mit-license.org/'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:git://github.com/apologist-project/apg-sdk-java.git'
-                    developerConnection = 'scm:git:git://github.com/apologist-project/apg-sdk-java.git'
-                    url = 'https://github.com/apologist-project/apg-sdk-java'
-                }
+mavenPublishing {
+    publishToMavenCentral(true)
+    signAllPublications()
+
+    coordinates('ai.apologist', 'apologist', version.toString())
+
+    pom {
+        name = 'Apologist'
+        description = 'Official Java client for the Apologist Agent API.'
+        inceptionYear = '2025'
+        url = 'https://github.com/apologist-project/apg-sdk-java'
+        licenses {
+            license {
+                name = 'The MIT License'
+                url = 'https://opensource.org/licenses/MIT'
+                distribution = 'repo'
             }
         }
-    }
-    repositories {
-        maven {
-            url "$System.env.MAVEN_PUBLISH_REGISTRY_URL"
-            credentials {
-                username "$System.env.MAVEN_USERNAME"
-                password "$System.env.MAVEN_PASSWORD"
+        developers {
+            developer {
+                id = 'apologist'
+                name = 'Apologist'
+                url = 'https://apologist.ai'
             }
+        }
+        scm {
+            url = 'https://github.com/apologist-project/apg-sdk-java'
+            connection = 'scm:git:git://github.com/apologist-project/apg-sdk-java.git'
+            developerConnection = 'scm:git:ssh://git@github.com/apologist-project/apg-sdk-java.git'
         }
     }
 }
-

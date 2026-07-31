@@ -1,0 +1,4 @@
+# Maven Central publish config
+build.gradle
+.github/workflows/ci.yml
+LICENSE
