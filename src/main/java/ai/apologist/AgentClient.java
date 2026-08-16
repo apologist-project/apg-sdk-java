@@ -8,6 +8,7 @@ import ai.apologist.core.Suppliers;
 import ai.apologist.resources.benchmarks.BenchmarksClient;
 import ai.apologist.resources.channels.ChannelsClient;
 import ai.apologist.resources.chat.ChatClient;
+import ai.apologist.resources.conversations.ConversationsClient;
 import ai.apologist.resources.corpus.CorpusClient;
 import ai.apologist.resources.ctas.CtAsClient;
 import ai.apologist.resources.evaluators.EvaluatorsClient;
@@ -30,6 +31,10 @@ public class AgentClient {
 
     protected final Supplier<BenchmarksClient> benchmarksClient;
 
+    protected final Supplier<ai.apologist.resources.agent.AgentClient> agentClient;
+
+    protected final Supplier<ConversationsClient> conversationsClient;
+
     protected final Supplier<ChannelsClient> channelsClient;
 
     protected final Supplier<SharesClient> sharesClient;
@@ -42,6 +47,8 @@ public class AgentClient {
         this.ctAsClient = Suppliers.memoize(() -> new CtAsClient(clientOptions));
         this.usersClient = Suppliers.memoize(() -> new UsersClient(clientOptions));
         this.benchmarksClient = Suppliers.memoize(() -> new BenchmarksClient(clientOptions));
+        this.agentClient = Suppliers.memoize(() -> new ai.apologist.resources.agent.AgentClient(clientOptions));
+        this.conversationsClient = Suppliers.memoize(() -> new ConversationsClient(clientOptions));
         this.channelsClient = Suppliers.memoize(() -> new ChannelsClient(clientOptions));
         this.sharesClient = Suppliers.memoize(() -> new SharesClient(clientOptions));
     }
@@ -68,6 +75,14 @@ public class AgentClient {
 
     public BenchmarksClient benchmarks() {
         return this.benchmarksClient.get();
+    }
+
+    public ai.apologist.resources.agent.AgentClient agent() {
+        return this.agentClient.get();
+    }
+
+    public ConversationsClient conversations() {
+        return this.conversationsClient.get();
     }
 
     public ChannelsClient channels() {

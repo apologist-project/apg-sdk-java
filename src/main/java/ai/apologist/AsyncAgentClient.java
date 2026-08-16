@@ -8,6 +8,7 @@ import ai.apologist.core.Suppliers;
 import ai.apologist.resources.benchmarks.AsyncBenchmarksClient;
 import ai.apologist.resources.channels.AsyncChannelsClient;
 import ai.apologist.resources.chat.AsyncChatClient;
+import ai.apologist.resources.conversations.AsyncConversationsClient;
 import ai.apologist.resources.corpus.AsyncCorpusClient;
 import ai.apologist.resources.ctas.AsyncCtAsClient;
 import ai.apologist.resources.evaluators.AsyncEvaluatorsClient;
@@ -30,6 +31,10 @@ public class AsyncAgentClient {
 
     protected final Supplier<AsyncBenchmarksClient> benchmarksClient;
 
+    protected final Supplier<ai.apologist.resources.agent.AsyncAgentClient> agentClient;
+
+    protected final Supplier<AsyncConversationsClient> conversationsClient;
+
     protected final Supplier<AsyncChannelsClient> channelsClient;
 
     protected final Supplier<AsyncSharesClient> sharesClient;
@@ -42,6 +47,8 @@ public class AsyncAgentClient {
         this.ctAsClient = Suppliers.memoize(() -> new AsyncCtAsClient(clientOptions));
         this.usersClient = Suppliers.memoize(() -> new AsyncUsersClient(clientOptions));
         this.benchmarksClient = Suppliers.memoize(() -> new AsyncBenchmarksClient(clientOptions));
+        this.agentClient = Suppliers.memoize(() -> new ai.apologist.resources.agent.AsyncAgentClient(clientOptions));
+        this.conversationsClient = Suppliers.memoize(() -> new AsyncConversationsClient(clientOptions));
         this.channelsClient = Suppliers.memoize(() -> new AsyncChannelsClient(clientOptions));
         this.sharesClient = Suppliers.memoize(() -> new AsyncSharesClient(clientOptions));
     }
@@ -68,6 +75,14 @@ public class AsyncAgentClient {
 
     public AsyncBenchmarksClient benchmarks() {
         return this.benchmarksClient.get();
+    }
+
+    public ai.apologist.resources.agent.AsyncAgentClient agent() {
+        return this.agentClient.get();
+    }
+
+    public AsyncConversationsClient conversations() {
+        return this.conversationsClient.get();
     }
 
     public AsyncChannelsClient channels() {

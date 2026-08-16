@@ -13,7 +13,9 @@ import ai.apologist.resources.channels.requests.ReceiveFacebookMessageRequest;
 import ai.apologist.resources.channels.requests.ReceiveLineWebhookRequest;
 import ai.apologist.resources.channels.requests.ReceiveTelegramUpdateRequest;
 import ai.apologist.resources.channels.requests.ReceiveTwilioMessageRequest;
+import ai.apologist.resources.channels.requests.ReceiveWhatsAppMessageRequest;
 import ai.apologist.resources.channels.requests.VerifyFacebookWebhookRequest;
+import ai.apologist.resources.channels.requests.VerifyWhatsAppWebhookRequest;
 import ai.apologist.resources.channels.types.GetDiscordChannelStatusResponse;
 import ai.apologist.resources.channels.types.GetLineChannelStatusResponse;
 import java.util.Map;
@@ -239,5 +241,49 @@ public class ChannelsClient {
      */
     public void receiveTwilioMessage(String id, ReceiveTwilioMessageRequest request, RequestOptions requestOptions) {
         this.rawClient.receiveTwilioMessage(id, request, requestOptions).body();
+    }
+
+    /**
+     * Handles the Meta WhatsApp Cloud API webhook verification handshake, echoing <code>hub.challenge</code> when <code>hub.verify_token</code> matches the channel's configured token.
+     */
+    public String verifyWhatsAppWebhook(String id, VerifyWhatsAppWebhookRequest request) {
+        return this.rawClient.verifyWhatsAppWebhook(id, request).body();
+    }
+
+    /**
+     * Handles the Meta WhatsApp Cloud API webhook verification handshake, echoing <code>hub.challenge</code> when <code>hub.verify_token</code> matches the channel's configured token.
+     */
+    public String verifyWhatsAppWebhook(
+            String id, VerifyWhatsAppWebhookRequest request, RequestOptions requestOptions) {
+        return this.rawClient.verifyWhatsAppWebhook(id, request, requestOptions).body();
+    }
+
+    /**
+     * Receives WhatsApp Cloud API message events for the channel. Payload shape is defined by Meta. Signature verification via <code>x-hub-signature-256</code> is used when the channel has an App Secret configured; otherwise the webhook relies on URL secrecy and/or an <code>api_key</code> query parameter.
+     */
+    public void receiveWhatsAppMessage(String id, Map<String, Object> body) {
+        this.rawClient.receiveWhatsAppMessage(id, body).body();
+    }
+
+    /**
+     * Receives WhatsApp Cloud API message events for the channel. Payload shape is defined by Meta. Signature verification via <code>x-hub-signature-256</code> is used when the channel has an App Secret configured; otherwise the webhook relies on URL secrecy and/or an <code>api_key</code> query parameter.
+     */
+    public void receiveWhatsAppMessage(String id, Map<String, Object> body, RequestOptions requestOptions) {
+        this.rawClient.receiveWhatsAppMessage(id, body, requestOptions).body();
+    }
+
+    /**
+     * Receives WhatsApp Cloud API message events for the channel. Payload shape is defined by Meta. Signature verification via <code>x-hub-signature-256</code> is used when the channel has an App Secret configured; otherwise the webhook relies on URL secrecy and/or an <code>api_key</code> query parameter.
+     */
+    public void receiveWhatsAppMessage(String id, ReceiveWhatsAppMessageRequest request) {
+        this.rawClient.receiveWhatsAppMessage(id, request).body();
+    }
+
+    /**
+     * Receives WhatsApp Cloud API message events for the channel. Payload shape is defined by Meta. Signature verification via <code>x-hub-signature-256</code> is used when the channel has an App Secret configured; otherwise the webhook relies on URL secrecy and/or an <code>api_key</code> query parameter.
+     */
+    public void receiveWhatsAppMessage(
+            String id, ReceiveWhatsAppMessageRequest request, RequestOptions requestOptions) {
+        this.rawClient.receiveWhatsAppMessage(id, request, requestOptions).body();
     }
 }
