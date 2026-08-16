@@ -7,12 +7,16 @@ import ai.apologist.core.ClientOptions;
 import ai.apologist.core.RequestOptions;
 import ai.apologist.resources.channels.requests.GetDiscordChannelStatusRequest;
 import ai.apologist.resources.channels.requests.GetInstagramPrivacyPolicyRequest;
+import ai.apologist.resources.channels.requests.GetLineChannelStatusRequest;
 import ai.apologist.resources.channels.requests.ReceiveDiscordInteractionRequest;
 import ai.apologist.resources.channels.requests.ReceiveFacebookMessageRequest;
+import ai.apologist.resources.channels.requests.ReceiveLineWebhookRequest;
 import ai.apologist.resources.channels.requests.ReceiveTelegramUpdateRequest;
 import ai.apologist.resources.channels.requests.ReceiveTwilioMessageRequest;
 import ai.apologist.resources.channels.requests.VerifyFacebookWebhookRequest;
 import ai.apologist.resources.channels.types.GetDiscordChannelStatusResponse;
+import ai.apologist.resources.channels.types.GetLineChannelStatusResponse;
+import java.util.Map;
 
 public class ChannelsClient {
     protected final ClientOptions clientOptions;
@@ -75,6 +79,63 @@ public class ChannelsClient {
     public void receiveDiscordInteraction(
             String id, ReceiveDiscordInteractionRequest request, RequestOptions requestOptions) {
         this.rawClient.receiveDiscordInteraction(id, request, requestOptions).body();
+    }
+
+    /**
+     * Returns the status of the LINE channel. Used as a lightweight health/verification endpoint.
+     */
+    public GetLineChannelStatusResponse getLineChannelStatus(String id) {
+        return this.rawClient.getLineChannelStatus(id).body();
+    }
+
+    /**
+     * Returns the status of the LINE channel. Used as a lightweight health/verification endpoint.
+     */
+    public GetLineChannelStatusResponse getLineChannelStatus(String id, RequestOptions requestOptions) {
+        return this.rawClient.getLineChannelStatus(id, requestOptions).body();
+    }
+
+    /**
+     * Returns the status of the LINE channel. Used as a lightweight health/verification endpoint.
+     */
+    public GetLineChannelStatusResponse getLineChannelStatus(String id, GetLineChannelStatusRequest request) {
+        return this.rawClient.getLineChannelStatus(id, request).body();
+    }
+
+    /**
+     * Returns the status of the LINE channel. Used as a lightweight health/verification endpoint.
+     */
+    public GetLineChannelStatusResponse getLineChannelStatus(
+            String id, GetLineChannelStatusRequest request, RequestOptions requestOptions) {
+        return this.rawClient.getLineChannelStatus(id, request, requestOptions).body();
+    }
+
+    /**
+     * Receives LINE Messaging API webhook events for the channel. Requests are verified via the <code>x-line-signature</code> HMAC-SHA256 (Base64) header using the channel secret unless an <code>api_key</code> is present. Payload shape is defined by LINE. The route acknowledges quickly and processes text <code>message</code> and <code>follow</code> events asynchronously.
+     */
+    public void receiveLineWebhook(String id, Map<String, Object> body) {
+        this.rawClient.receiveLineWebhook(id, body).body();
+    }
+
+    /**
+     * Receives LINE Messaging API webhook events for the channel. Requests are verified via the <code>x-line-signature</code> HMAC-SHA256 (Base64) header using the channel secret unless an <code>api_key</code> is present. Payload shape is defined by LINE. The route acknowledges quickly and processes text <code>message</code> and <code>follow</code> events asynchronously.
+     */
+    public void receiveLineWebhook(String id, Map<String, Object> body, RequestOptions requestOptions) {
+        this.rawClient.receiveLineWebhook(id, body, requestOptions).body();
+    }
+
+    /**
+     * Receives LINE Messaging API webhook events for the channel. Requests are verified via the <code>x-line-signature</code> HMAC-SHA256 (Base64) header using the channel secret unless an <code>api_key</code> is present. Payload shape is defined by LINE. The route acknowledges quickly and processes text <code>message</code> and <code>follow</code> events asynchronously.
+     */
+    public void receiveLineWebhook(String id, ReceiveLineWebhookRequest request) {
+        this.rawClient.receiveLineWebhook(id, request).body();
+    }
+
+    /**
+     * Receives LINE Messaging API webhook events for the channel. Requests are verified via the <code>x-line-signature</code> HMAC-SHA256 (Base64) header using the channel secret unless an <code>api_key</code> is present. Payload shape is defined by LINE. The route acknowledges quickly and processes text <code>message</code> and <code>follow</code> events asynchronously.
+     */
+    public void receiveLineWebhook(String id, ReceiveLineWebhookRequest request, RequestOptions requestOptions) {
+        this.rawClient.receiveLineWebhook(id, request, requestOptions).body();
     }
 
     /**

@@ -20,14 +20,18 @@ import ai.apologist.errors.ServiceUnavailableError;
 import ai.apologist.errors.UnauthorizedError;
 import ai.apologist.resources.channels.requests.GetDiscordChannelStatusRequest;
 import ai.apologist.resources.channels.requests.GetInstagramPrivacyPolicyRequest;
+import ai.apologist.resources.channels.requests.GetLineChannelStatusRequest;
 import ai.apologist.resources.channels.requests.ReceiveDiscordInteractionRequest;
 import ai.apologist.resources.channels.requests.ReceiveFacebookMessageRequest;
+import ai.apologist.resources.channels.requests.ReceiveLineWebhookRequest;
 import ai.apologist.resources.channels.requests.ReceiveTelegramUpdateRequest;
 import ai.apologist.resources.channels.requests.ReceiveTwilioMessageRequest;
 import ai.apologist.resources.channels.requests.VerifyFacebookWebhookRequest;
 import ai.apologist.resources.channels.types.GetDiscordChannelStatusResponse;
+import ai.apologist.resources.channels.types.GetLineChannelStatusResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
+import java.util.Map;
 import okhttp3.FormBody;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
@@ -194,6 +198,193 @@ public class RawChannelsClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 401:
                         throw new UnauthorizedError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new AgentClientApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new AgentClientException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AgentClientException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Returns the status of the LINE channel. Used as a lightweight health/verification endpoint.
+     */
+    public AgentClientHttpResponse<GetLineChannelStatusResponse> getLineChannelStatus(String id) {
+        return getLineChannelStatus(id, GetLineChannelStatusRequest.builder().build());
+    }
+
+    /**
+     * Returns the status of the LINE channel. Used as a lightweight health/verification endpoint.
+     */
+    public AgentClientHttpResponse<GetLineChannelStatusResponse> getLineChannelStatus(
+            String id, RequestOptions requestOptions) {
+        return getLineChannelStatus(id, GetLineChannelStatusRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Returns the status of the LINE channel. Used as a lightweight health/verification endpoint.
+     */
+    public AgentClientHttpResponse<GetLineChannelStatusResponse> getLineChannelStatus(
+            String id, GetLineChannelStatusRequest request) {
+        return getLineChannelStatus(id, request, null);
+    }
+
+    /**
+     * Returns the status of the LINE channel. Used as a lightweight health/verification endpoint.
+     */
+    public AgentClientHttpResponse<GetLineChannelStatusResponse> getLineChannelStatus(
+            String id, GetLineChannelStatusRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+                .newBuilder()
+                .addPathSegments("channels")
+                .addPathSegment(id)
+                .addPathSegments("line");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method("GET", null)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new AgentClientHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, GetLineChannelStatusResponse.class),
+                        response);
+            }
+            try {
+                if (response.code() == 404) {
+                    throw new NotFoundError(
+                            ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new AgentClientApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new AgentClientException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AgentClientException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Receives LINE Messaging API webhook events for the channel. Requests are verified via the <code>x-line-signature</code> HMAC-SHA256 (Base64) header using the channel secret unless an <code>api_key</code> is present. Payload shape is defined by LINE. The route acknowledges quickly and processes text <code>message</code> and <code>follow</code> events asynchronously.
+     */
+    public AgentClientHttpResponse<Void> receiveLineWebhook(String id, Map<String, Object> body) {
+        return receiveLineWebhook(
+                id, ReceiveLineWebhookRequest.builder().body(body).build());
+    }
+
+    /**
+     * Receives LINE Messaging API webhook events for the channel. Requests are verified via the <code>x-line-signature</code> HMAC-SHA256 (Base64) header using the channel secret unless an <code>api_key</code> is present. Payload shape is defined by LINE. The route acknowledges quickly and processes text <code>message</code> and <code>follow</code> events asynchronously.
+     */
+    public AgentClientHttpResponse<Void> receiveLineWebhook(
+            String id, Map<String, Object> body, RequestOptions requestOptions) {
+        return receiveLineWebhook(
+                id, ReceiveLineWebhookRequest.builder().body(body).build(), requestOptions);
+    }
+
+    /**
+     * Receives LINE Messaging API webhook events for the channel. Requests are verified via the <code>x-line-signature</code> HMAC-SHA256 (Base64) header using the channel secret unless an <code>api_key</code> is present. Payload shape is defined by LINE. The route acknowledges quickly and processes text <code>message</code> and <code>follow</code> events asynchronously.
+     */
+    public AgentClientHttpResponse<Void> receiveLineWebhook(String id, ReceiveLineWebhookRequest request) {
+        return receiveLineWebhook(id, request, null);
+    }
+
+    /**
+     * Receives LINE Messaging API webhook events for the channel. Requests are verified via the <code>x-line-signature</code> HMAC-SHA256 (Base64) header using the channel secret unless an <code>api_key</code> is present. Payload shape is defined by LINE. The route acknowledges quickly and processes text <code>message</code> and <code>follow</code> events asynchronously.
+     */
+    public AgentClientHttpResponse<Void> receiveLineWebhook(
+            String id, ReceiveLineWebhookRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+                .newBuilder()
+                .addPathSegments("channels")
+                .addPathSegment(id)
+                .addPathSegments("line");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request.getBody()), MediaTypes.APPLICATION_JSON);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json");
+        if (request.getLineSignature().isPresent()) {
+            _requestBuilder.addHeader(
+                    "x-line-signature", request.getLineSignature().get());
+        }
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            if (response.isSuccessful()) {
+                return new AgentClientHttpResponse<>(null, response);
+            }
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            try {
+                switch (response.code()) {
+                    case 400:
+                        throw new BadRequestError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 500:
+                        throw new InternalServerError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 503:
+                        throw new ServiceUnavailableError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {

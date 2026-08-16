@@ -286,7 +286,7 @@ public class RawCorpusClient {
     }
 
     /**
-     * Records a referral for a corpus item and, when a <code>url</code> is supplied, issues a 302 redirect to it. Without a <code>url</code>, responds with a success message. Requires either the search API entitlement or a same-origin request.
+     * Records a referral for a corpus item and, when a <code>url</code> is supplied, issues a 302 redirect to it. Without a <code>url</code>, responds with a success message. Requires either the search API entitlement or a signed <code>browser_key</code> cookie.
      */
     public AgentClientHttpResponse<SuccessResponse> logCorpusReferralRedirect(
             String model, String id, LogCorpusReferralRedirectRequest request) {
@@ -294,7 +294,7 @@ public class RawCorpusClient {
     }
 
     /**
-     * Records a referral for a corpus item and, when a <code>url</code> is supplied, issues a 302 redirect to it. Without a <code>url</code>, responds with a success message. Requires either the search API entitlement or a same-origin request.
+     * Records a referral for a corpus item and, when a <code>url</code> is supplied, issues a 302 redirect to it. Without a <code>url</code>, responds with a success message. Requires either the search API entitlement or a signed <code>browser_key</code> cookie.
      */
     public AgentClientHttpResponse<SuccessResponse> logCorpusReferralRedirect(
             String model, String id, LogCorpusReferralRedirectRequest request, RequestOptions requestOptions) {
