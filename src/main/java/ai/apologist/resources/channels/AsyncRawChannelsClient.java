@@ -26,7 +26,9 @@ import ai.apologist.resources.channels.requests.ReceiveFacebookMessageRequest;
 import ai.apologist.resources.channels.requests.ReceiveLineWebhookRequest;
 import ai.apologist.resources.channels.requests.ReceiveTelegramUpdateRequest;
 import ai.apologist.resources.channels.requests.ReceiveTwilioMessageRequest;
+import ai.apologist.resources.channels.requests.ReceiveWhatsAppMessageRequest;
 import ai.apologist.resources.channels.requests.VerifyFacebookWebhookRequest;
+import ai.apologist.resources.channels.requests.VerifyWhatsAppWebhookRequest;
 import ai.apologist.resources.channels.types.GetDiscordChannelStatusResponse;
 import ai.apologist.resources.channels.types.GetLineChannelStatusResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -946,6 +948,228 @@ public class AsyncRawChannelsClient {
                                 return;
                             case 500:
                                 future.completeExceptionally(new InternalServerError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new AgentClientApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new AgentClientException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Handles the Meta WhatsApp Cloud API webhook verification handshake, echoing <code>hub.challenge</code> when <code>hub.verify_token</code> matches the channel's configured token.
+     */
+    public CompletableFuture<AgentClientHttpResponse<String>> verifyWhatsAppWebhook(
+            String id, VerifyWhatsAppWebhookRequest request) {
+        return verifyWhatsAppWebhook(id, request, null);
+    }
+
+    /**
+     * Handles the Meta WhatsApp Cloud API webhook verification handshake, echoing <code>hub.challenge</code> when <code>hub.verify_token</code> matches the channel's configured token.
+     */
+    public CompletableFuture<AgentClientHttpResponse<String>> verifyWhatsAppWebhook(
+            String id, VerifyWhatsAppWebhookRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+                .newBuilder()
+                .addPathSegments("channels")
+                .addPathSegment(id)
+                .addPathSegments("whatsapp");
+        QueryStringMapper.addQueryParameter(httpUrl, "hub.mode", request.getHubMode(), false);
+        QueryStringMapper.addQueryParameter(httpUrl, "hub.verify_token", request.getHubVerifyToken(), false);
+        if (request.getHubChallenge().isPresent()) {
+            QueryStringMapper.addQueryParameter(
+                    httpUrl, "hub.challenge", request.getHubChallenge().get(), false);
+        }
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method("GET", null)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<AgentClientHttpResponse<String>> future = new CompletableFuture<>();
+        client.newCall(okhttpRequest).enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    if (response.isSuccessful()) {
+                        future.complete(new AgentClientHttpResponse<>(responseBodyString, response));
+                        return;
+                    }
+                    try {
+                        switch (response.code()) {
+                            case 400:
+                                future.completeExceptionally(new BadRequestError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 403:
+                                future.completeExceptionally(new ForbiddenError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 404:
+                                future.completeExceptionally(new NotFoundError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                        }
+                    } catch (JsonProcessingException ignored) {
+                        // unable to map error response, throwing generic error
+                    }
+                    Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+                    future.completeExceptionally(new AgentClientApiException(
+                            "Error with status code " + response.code(), response.code(), errorBody, response));
+                    return;
+                } catch (JsonProcessingException e) {
+                    future.completeExceptionally(
+                            new AgentClientException("Failed to deserialize response: " + e.getMessage(), e));
+                } catch (IOException e) {
+                    future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                future.completeExceptionally(new AgentClientException("Network error executing HTTP request", e));
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Receives WhatsApp Cloud API message events for the channel. Payload shape is defined by Meta. Signature verification via <code>x-hub-signature-256</code> is used when the channel has an App Secret configured; otherwise the webhook relies on URL secrecy and/or an <code>api_key</code> query parameter.
+     */
+    public CompletableFuture<AgentClientHttpResponse<Void>> receiveWhatsAppMessage(
+            String id, Map<String, Object> body) {
+        return receiveWhatsAppMessage(
+                id, ReceiveWhatsAppMessageRequest.builder().body(body).build());
+    }
+
+    /**
+     * Receives WhatsApp Cloud API message events for the channel. Payload shape is defined by Meta. Signature verification via <code>x-hub-signature-256</code> is used when the channel has an App Secret configured; otherwise the webhook relies on URL secrecy and/or an <code>api_key</code> query parameter.
+     */
+    public CompletableFuture<AgentClientHttpResponse<Void>> receiveWhatsAppMessage(
+            String id, Map<String, Object> body, RequestOptions requestOptions) {
+        return receiveWhatsAppMessage(
+                id, ReceiveWhatsAppMessageRequest.builder().body(body).build(), requestOptions);
+    }
+
+    /**
+     * Receives WhatsApp Cloud API message events for the channel. Payload shape is defined by Meta. Signature verification via <code>x-hub-signature-256</code> is used when the channel has an App Secret configured; otherwise the webhook relies on URL secrecy and/or an <code>api_key</code> query parameter.
+     */
+    public CompletableFuture<AgentClientHttpResponse<Void>> receiveWhatsAppMessage(
+            String id, ReceiveWhatsAppMessageRequest request) {
+        return receiveWhatsAppMessage(id, request, null);
+    }
+
+    /**
+     * Receives WhatsApp Cloud API message events for the channel. Payload shape is defined by Meta. Signature verification via <code>x-hub-signature-256</code> is used when the channel has an App Secret configured; otherwise the webhook relies on URL secrecy and/or an <code>api_key</code> query parameter.
+     */
+    public CompletableFuture<AgentClientHttpResponse<Void>> receiveWhatsAppMessage(
+            String id, ReceiveWhatsAppMessageRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+                .newBuilder()
+                .addPathSegments("channels")
+                .addPathSegment(id)
+                .addPathSegments("whatsapp");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request.getBody()), MediaTypes.APPLICATION_JSON);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json");
+        if (request.getHubSignature256().isPresent()) {
+            _requestBuilder.addHeader(
+                    "x-hub-signature-256", request.getHubSignature256().get());
+        }
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        CompletableFuture<AgentClientHttpResponse<Void>> future = new CompletableFuture<>();
+        client.newCall(okhttpRequest).enqueue(new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                try (ResponseBody responseBody = response.body()) {
+                    if (response.isSuccessful()) {
+                        future.complete(new AgentClientHttpResponse<>(null, response));
+                        return;
+                    }
+                    String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+                    try {
+                        switch (response.code()) {
+                            case 403:
+                                future.completeExceptionally(new ForbiddenError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 500:
+                                future.completeExceptionally(new InternalServerError(
+                                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
+                                        response));
+                                return;
+                            case 503:
+                                future.completeExceptionally(new ServiceUnavailableError(
                                         ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class),
                                         response));
                                 return;
