@@ -28,6 +28,8 @@ public final class User {
 
     private final Optional<String> externalId;
 
+    private final Optional<String> referralCode;
+
     private final Optional<Integer> teamId;
 
     private final Optional<String> createdAt;
@@ -45,6 +47,7 @@ public final class User {
     private User(
             Optional<String> id,
             Optional<String> externalId,
+            Optional<String> referralCode,
             Optional<Integer> teamId,
             Optional<String> createdAt,
             Optional<String> migratedAt,
@@ -54,6 +57,7 @@ public final class User {
             Map<String, Object> additionalProperties) {
         this.id = id;
         this.externalId = externalId;
+        this.referralCode = referralCode;
         this.teamId = teamId;
         this.createdAt = createdAt;
         this.migratedAt = migratedAt;
@@ -77,6 +81,17 @@ public final class User {
             return Optional.empty();
         }
         return externalId;
+    }
+
+    /**
+     * @return First-write-wins acquisition / campaign referral code.
+     */
+    @JsonIgnore
+    public Optional<String> getReferralCode() {
+        if (referralCode == null) {
+            return Optional.empty();
+        }
+        return referralCode;
     }
 
     @JsonProperty("team_id")
@@ -125,6 +140,12 @@ public final class User {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("referral_code")
+    private Optional<String> _getReferralCode() {
+        return referralCode;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("migrated_at")
     private Optional<String> _getMigratedAt() {
         return migratedAt;
@@ -156,6 +177,7 @@ public final class User {
     private boolean equalTo(User other) {
         return id.equals(other.id)
                 && externalId.equals(other.externalId)
+                && referralCode.equals(other.referralCode)
                 && teamId.equals(other.teamId)
                 && createdAt.equals(other.createdAt)
                 && migratedAt.equals(other.migratedAt)
@@ -169,6 +191,7 @@ public final class User {
         return Objects.hash(
                 this.id,
                 this.externalId,
+                this.referralCode,
                 this.teamId,
                 this.createdAt,
                 this.migratedAt,
@@ -192,6 +215,8 @@ public final class User {
 
         private Optional<String> externalId = Optional.empty();
 
+        private Optional<String> referralCode = Optional.empty();
+
         private Optional<Integer> teamId = Optional.empty();
 
         private Optional<String> createdAt = Optional.empty();
@@ -212,6 +237,7 @@ public final class User {
         public Builder from(User other) {
             id(other.getId());
             externalId(other.getExternalId());
+            referralCode(other.getReferralCode());
             teamId(other.getTeamId());
             createdAt(other.getCreatedAt());
             migratedAt(other.getMigratedAt());
@@ -253,6 +279,31 @@ public final class User {
                 this.externalId = Optional.empty();
             } else {
                 this.externalId = Optional.of(externalId.get());
+            }
+            return this;
+        }
+
+        /**
+         * <p>First-write-wins acquisition / campaign referral code.</p>
+         */
+        @JsonSetter(value = "referral_code", nulls = Nulls.SKIP)
+        public Builder referralCode(Optional<String> referralCode) {
+            this.referralCode = referralCode;
+            return this;
+        }
+
+        public Builder referralCode(String referralCode) {
+            this.referralCode = Optional.ofNullable(referralCode);
+            return this;
+        }
+
+        public Builder referralCode(Nullable<String> referralCode) {
+            if (referralCode.isNull()) {
+                this.referralCode = null;
+            } else if (referralCode.isEmpty()) {
+                this.referralCode = Optional.empty();
+            } else {
+                this.referralCode = Optional.of(referralCode.get());
             }
             return this;
         }
@@ -360,6 +411,7 @@ public final class User {
             return new User(
                     id,
                     externalId,
+                    referralCode,
                     teamId,
                     createdAt,
                     migratedAt,

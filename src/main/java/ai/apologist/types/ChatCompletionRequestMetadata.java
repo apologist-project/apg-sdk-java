@@ -39,6 +39,8 @@ public final class ChatCompletionRequestMetadata {
 
     private final Optional<String> device;
 
+    private final Optional<String> referralCode;
+
     private final Optional<Integer> sharedPrompt;
 
     private final Optional<String> translation;
@@ -56,6 +58,7 @@ public final class ChatCompletionRequestMetadata {
             Optional<String> parentHost,
             Optional<String> session,
             Optional<String> device,
+            Optional<String> referralCode,
             Optional<Integer> sharedPrompt,
             Optional<String> translation,
             Optional<Map<String, Optional<String>>> variables,
@@ -68,6 +71,7 @@ public final class ChatCompletionRequestMetadata {
         this.parentHost = parentHost;
         this.session = session;
         this.device = device;
+        this.referralCode = referralCode;
         this.sharedPrompt = sharedPrompt;
         this.translation = translation;
         this.variables = variables;
@@ -136,6 +140,17 @@ public final class ChatCompletionRequestMetadata {
             return Optional.empty();
         }
         return device;
+    }
+
+    /**
+     * @return Acquisition / campaign referral code stored on the user first-write-wins. Empty values are ignored; an existing user referral_code is never overwritten. The Agent UI maps ?ref=, then ?referral_code=, then ?utm_campaign= into this field.
+     */
+    @JsonIgnore
+    public Optional<String> getReferralCode() {
+        if (referralCode == null) {
+            return Optional.empty();
+        }
+        return referralCode;
     }
 
     @JsonIgnore
@@ -214,6 +229,12 @@ public final class ChatCompletionRequestMetadata {
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("referral_code")
+    private Optional<String> _getReferralCode() {
+        return referralCode;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
     @JsonProperty("shared_prompt")
     private Optional<Integer> _getSharedPrompt() {
         return sharedPrompt;
@@ -251,6 +272,7 @@ public final class ChatCompletionRequestMetadata {
                 && parentHost.equals(other.parentHost)
                 && session.equals(other.session)
                 && device.equals(other.device)
+                && referralCode.equals(other.referralCode)
                 && sharedPrompt.equals(other.sharedPrompt)
                 && translation.equals(other.translation)
                 && variables.equals(other.variables);
@@ -267,6 +289,7 @@ public final class ChatCompletionRequestMetadata {
                 this.parentHost,
                 this.session,
                 this.device,
+                this.referralCode,
                 this.sharedPrompt,
                 this.translation,
                 this.variables);
@@ -299,6 +322,8 @@ public final class ChatCompletionRequestMetadata {
 
         private Optional<String> device = Optional.empty();
 
+        private Optional<String> referralCode = Optional.empty();
+
         private Optional<Integer> sharedPrompt = Optional.empty();
 
         private Optional<String> translation = Optional.empty();
@@ -319,6 +344,7 @@ public final class ChatCompletionRequestMetadata {
             parentHost(other.getParentHost());
             session(other.getSession());
             device(other.getDevice());
+            referralCode(other.getReferralCode());
             sharedPrompt(other.getSharedPrompt());
             translation(other.getTranslation());
             variables(other.getVariables());
@@ -501,6 +527,31 @@ public final class ChatCompletionRequestMetadata {
             return this;
         }
 
+        /**
+         * <p>Acquisition / campaign referral code stored on the user first-write-wins. Empty values are ignored; an existing user referral_code is never overwritten. The Agent UI maps ?ref=, then ?referral_code=, then ?utm_campaign= into this field.</p>
+         */
+        @JsonSetter(value = "referral_code", nulls = Nulls.SKIP)
+        public Builder referralCode(Optional<String> referralCode) {
+            this.referralCode = referralCode;
+            return this;
+        }
+
+        public Builder referralCode(String referralCode) {
+            this.referralCode = Optional.ofNullable(referralCode);
+            return this;
+        }
+
+        public Builder referralCode(Nullable<String> referralCode) {
+            if (referralCode.isNull()) {
+                this.referralCode = null;
+            } else if (referralCode.isEmpty()) {
+                this.referralCode = Optional.empty();
+            } else {
+                this.referralCode = Optional.of(referralCode.get());
+            }
+            return this;
+        }
+
         @JsonSetter(value = "shared_prompt", nulls = Nulls.SKIP)
         public Builder sharedPrompt(Optional<Integer> sharedPrompt) {
             this.sharedPrompt = sharedPrompt;
@@ -580,6 +631,7 @@ public final class ChatCompletionRequestMetadata {
                     parentHost,
                     session,
                     device,
+                    referralCode,
                     sharedPrompt,
                     translation,
                     variables,
