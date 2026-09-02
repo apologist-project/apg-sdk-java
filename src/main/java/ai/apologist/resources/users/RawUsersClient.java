@@ -17,13 +17,17 @@ import ai.apologist.errors.ForbiddenError;
 import ai.apologist.errors.InternalServerError;
 import ai.apologist.errors.NotFoundError;
 import ai.apologist.errors.UnprocessableEntityError;
+import ai.apologist.resources.users.requests.AnonymizeUserRequest;
 import ai.apologist.resources.users.requests.GetUserRequest;
 import ai.apologist.resources.users.requests.ListUserFlagsRequest;
 import ai.apologist.resources.users.requests.ListUsersRequest;
+import ai.apologist.resources.users.requests.ScrubUserRequest;
 import ai.apologist.resources.users.requests.UserUpdateRequest;
+import ai.apologist.resources.users.types.AnonymizeUserResponse;
 import ai.apologist.resources.users.types.GetUserResponse;
 import ai.apologist.resources.users.types.ListUserFlagsResponse;
 import ai.apologist.resources.users.types.ListUsersResponse;
+import ai.apologist.resources.users.types.ScrubUserResponse;
 import ai.apologist.resources.users.types.UpdateUserResponse;
 import ai.apologist.types.Error;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -412,6 +416,180 @@ public class RawUsersClient {
                     case 422:
                         throw new UnprocessableEntityError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Error.class), response);
+                    case 500:
+                        throw new InternalServerError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new AgentClientApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new AgentClientException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AgentClientException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Replaces this user's message-adjacent text with a placeholder. Conversation rows, identifiers, flags, and analytics identity stay in place. Repeat calls finish leftover rows.
+     */
+    public AgentClientHttpResponse<ScrubUserResponse> scrubUser(String userId) {
+        return scrubUser(userId, ScrubUserRequest.builder().build());
+    }
+
+    /**
+     * Replaces this user's message-adjacent text with a placeholder. Conversation rows, identifiers, flags, and analytics identity stay in place. Repeat calls finish leftover rows.
+     */
+    public AgentClientHttpResponse<ScrubUserResponse> scrubUser(String userId, RequestOptions requestOptions) {
+        return scrubUser(userId, ScrubUserRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Replaces this user's message-adjacent text with a placeholder. Conversation rows, identifiers, flags, and analytics identity stay in place. Repeat calls finish leftover rows.
+     */
+    public AgentClientHttpResponse<ScrubUserResponse> scrubUser(String userId, ScrubUserRequest request) {
+        return scrubUser(userId, request, null);
+    }
+
+    /**
+     * Replaces this user's message-adjacent text with a placeholder. Conversation rows, identifiers, flags, and analytics identity stay in place. Repeat calls finish leftover rows.
+     */
+    public AgentClientHttpResponse<ScrubUserResponse> scrubUser(
+            String userId, ScrubUserRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+                .newBuilder()
+                .addPathSegments("users")
+                .addPathSegment(userId)
+                .addPathSegments("scrub");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", RequestBody.create("", null))
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new AgentClientHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, ScrubUserResponse.class), response);
+            }
+            try {
+                switch (response.code()) {
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 404:
+                        throw new NotFoundError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 500:
+                        throw new InternalServerError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new AgentClientApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new AgentClientException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AgentClientException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Redacts detected personal data in this user's message-adjacent text with regex, then an optional hosted redaction service when the Agent has that option on. Conversation rows, identifiers, flags, and analytics identity stay in place. Repeat calls finish leftover rows and skip text that is already redacted.
+     */
+    public AgentClientHttpResponse<AnonymizeUserResponse> anonymizeUser(String userId) {
+        return anonymizeUser(userId, AnonymizeUserRequest.builder().build());
+    }
+
+    /**
+     * Redacts detected personal data in this user's message-adjacent text with regex, then an optional hosted redaction service when the Agent has that option on. Conversation rows, identifiers, flags, and analytics identity stay in place. Repeat calls finish leftover rows and skip text that is already redacted.
+     */
+    public AgentClientHttpResponse<AnonymizeUserResponse> anonymizeUser(String userId, RequestOptions requestOptions) {
+        return anonymizeUser(userId, AnonymizeUserRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Redacts detected personal data in this user's message-adjacent text with regex, then an optional hosted redaction service when the Agent has that option on. Conversation rows, identifiers, flags, and analytics identity stay in place. Repeat calls finish leftover rows and skip text that is already redacted.
+     */
+    public AgentClientHttpResponse<AnonymizeUserResponse> anonymizeUser(String userId, AnonymizeUserRequest request) {
+        return anonymizeUser(userId, request, null);
+    }
+
+    /**
+     * Redacts detected personal data in this user's message-adjacent text with regex, then an optional hosted redaction service when the Agent has that option on. Conversation rows, identifiers, flags, and analytics identity stay in place. Repeat calls finish leftover rows and skip text that is already redacted.
+     */
+    public AgentClientHttpResponse<AnonymizeUserResponse> anonymizeUser(
+            String userId, AnonymizeUserRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+                .newBuilder()
+                .addPathSegments("users")
+                .addPathSegment(userId)
+                .addPathSegments("anonymize");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", RequestBody.create("", null))
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new AgentClientHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, AnonymizeUserResponse.class), response);
+            }
+            try {
+                switch (response.code()) {
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 404:
+                        throw new NotFoundError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                     case 500:
                         throw new InternalServerError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);

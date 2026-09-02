@@ -5,9 +5,11 @@ package ai.apologist.resources.channels;
 
 import ai.apologist.core.ClientOptions;
 import ai.apologist.core.RequestOptions;
+import ai.apologist.resources.channels.requests.GetChatwootChannelStatusRequest;
 import ai.apologist.resources.channels.requests.GetDiscordChannelStatusRequest;
 import ai.apologist.resources.channels.requests.GetInstagramPrivacyPolicyRequest;
 import ai.apologist.resources.channels.requests.GetLineChannelStatusRequest;
+import ai.apologist.resources.channels.requests.ReceiveChatwootWebhookRequest;
 import ai.apologist.resources.channels.requests.ReceiveDiscordInteractionRequest;
 import ai.apologist.resources.channels.requests.ReceiveFacebookMessageRequest;
 import ai.apologist.resources.channels.requests.ReceiveLineWebhookRequest;
@@ -16,6 +18,7 @@ import ai.apologist.resources.channels.requests.ReceiveTwilioMessageRequest;
 import ai.apologist.resources.channels.requests.ReceiveWhatsAppMessageRequest;
 import ai.apologist.resources.channels.requests.VerifyFacebookWebhookRequest;
 import ai.apologist.resources.channels.requests.VerifyWhatsAppWebhookRequest;
+import ai.apologist.resources.channels.types.GetChatwootChannelStatusResponse;
 import ai.apologist.resources.channels.types.GetDiscordChannelStatusResponse;
 import ai.apologist.resources.channels.types.GetLineChannelStatusResponse;
 import java.util.Map;
@@ -36,6 +39,71 @@ public class AsyncChannelsClient {
      */
     public AsyncRawChannelsClient withRawResponse() {
         return this.rawClient;
+    }
+
+    /**
+     * Returns the status of the Chatwoot channel. Used as a lightweight health/verification endpoint.
+     */
+    public CompletableFuture<GetChatwootChannelStatusResponse> getChatwootChannelStatus(String id) {
+        return this.rawClient.getChatwootChannelStatus(id).thenApply(response -> response.body());
+    }
+
+    /**
+     * Returns the status of the Chatwoot channel. Used as a lightweight health/verification endpoint.
+     */
+    public CompletableFuture<GetChatwootChannelStatusResponse> getChatwootChannelStatus(
+            String id, RequestOptions requestOptions) {
+        return this.rawClient.getChatwootChannelStatus(id, requestOptions).thenApply(response -> response.body());
+    }
+
+    /**
+     * Returns the status of the Chatwoot channel. Used as a lightweight health/verification endpoint.
+     */
+    public CompletableFuture<GetChatwootChannelStatusResponse> getChatwootChannelStatus(
+            String id, GetChatwootChannelStatusRequest request) {
+        return this.rawClient.getChatwootChannelStatus(id, request).thenApply(response -> response.body());
+    }
+
+    /**
+     * Returns the status of the Chatwoot channel. Used as a lightweight health/verification endpoint.
+     */
+    public CompletableFuture<GetChatwootChannelStatusResponse> getChatwootChannelStatus(
+            String id, GetChatwootChannelStatusRequest request, RequestOptions requestOptions) {
+        return this.rawClient
+                .getChatwootChannelStatus(id, request, requestOptions)
+                .thenApply(response -> response.body());
+    }
+
+    /**
+     * Receives Chatwoot Agent Bot webhook events for the channel. Chatwoot owns the messaging inbox (Facebook, website widget, and others). This Agent replies through the Chatwoot API and maps native bot handoff to conversation pause/resume. Requests are verified via the <code>X-Chatwoot-Signature</code> HMAC-SHA256 header using the configured webhook secret unless an <code>api_key</code> is present and no secret is set. The route acknowledges immediately (Chatwoot times out in about 5 seconds) and processes events asynchronously.
+     */
+    public CompletableFuture<Void> receiveChatwootWebhook(String id, Map<String, Object> body) {
+        return this.rawClient.receiveChatwootWebhook(id, body).thenApply(response -> response.body());
+    }
+
+    /**
+     * Receives Chatwoot Agent Bot webhook events for the channel. Chatwoot owns the messaging inbox (Facebook, website widget, and others). This Agent replies through the Chatwoot API and maps native bot handoff to conversation pause/resume. Requests are verified via the <code>X-Chatwoot-Signature</code> HMAC-SHA256 header using the configured webhook secret unless an <code>api_key</code> is present and no secret is set. The route acknowledges immediately (Chatwoot times out in about 5 seconds) and processes events asynchronously.
+     */
+    public CompletableFuture<Void> receiveChatwootWebhook(
+            String id, Map<String, Object> body, RequestOptions requestOptions) {
+        return this.rawClient.receiveChatwootWebhook(id, body, requestOptions).thenApply(response -> response.body());
+    }
+
+    /**
+     * Receives Chatwoot Agent Bot webhook events for the channel. Chatwoot owns the messaging inbox (Facebook, website widget, and others). This Agent replies through the Chatwoot API and maps native bot handoff to conversation pause/resume. Requests are verified via the <code>X-Chatwoot-Signature</code> HMAC-SHA256 header using the configured webhook secret unless an <code>api_key</code> is present and no secret is set. The route acknowledges immediately (Chatwoot times out in about 5 seconds) and processes events asynchronously.
+     */
+    public CompletableFuture<Void> receiveChatwootWebhook(String id, ReceiveChatwootWebhookRequest request) {
+        return this.rawClient.receiveChatwootWebhook(id, request).thenApply(response -> response.body());
+    }
+
+    /**
+     * Receives Chatwoot Agent Bot webhook events for the channel. Chatwoot owns the messaging inbox (Facebook, website widget, and others). This Agent replies through the Chatwoot API and maps native bot handoff to conversation pause/resume. Requests are verified via the <code>X-Chatwoot-Signature</code> HMAC-SHA256 header using the configured webhook secret unless an <code>api_key</code> is present and no secret is set. The route acknowledges immediately (Chatwoot times out in about 5 seconds) and processes events asynchronously.
+     */
+    public CompletableFuture<Void> receiveChatwootWebhook(
+            String id, ReceiveChatwootWebhookRequest request, RequestOptions requestOptions) {
+        return this.rawClient
+                .receiveChatwootWebhook(id, request, requestOptions)
+                .thenApply(response -> response.body());
     }
 
     /**
