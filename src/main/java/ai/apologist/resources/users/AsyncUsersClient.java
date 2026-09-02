@@ -5,13 +5,17 @@ package ai.apologist.resources.users;
 
 import ai.apologist.core.ClientOptions;
 import ai.apologist.core.RequestOptions;
+import ai.apologist.resources.users.requests.AnonymizeUserRequest;
 import ai.apologist.resources.users.requests.GetUserRequest;
 import ai.apologist.resources.users.requests.ListUserFlagsRequest;
 import ai.apologist.resources.users.requests.ListUsersRequest;
+import ai.apologist.resources.users.requests.ScrubUserRequest;
 import ai.apologist.resources.users.requests.UserUpdateRequest;
+import ai.apologist.resources.users.types.AnonymizeUserResponse;
 import ai.apologist.resources.users.types.GetUserResponse;
 import ai.apologist.resources.users.types.ListUserFlagsResponse;
 import ai.apologist.resources.users.types.ListUsersResponse;
+import ai.apologist.resources.users.types.ScrubUserResponse;
 import ai.apologist.resources.users.types.UpdateUserResponse;
 import java.util.concurrent.CompletableFuture;
 
@@ -145,5 +149,63 @@ public class AsyncUsersClient {
     public CompletableFuture<UpdateUserResponse> updateUser(
             String userId, UserUpdateRequest request, RequestOptions requestOptions) {
         return this.rawClient.updateUser(userId, request, requestOptions).thenApply(response -> response.body());
+    }
+
+    /**
+     * Replaces this user's message-adjacent text with a placeholder. Conversation rows, identifiers, flags, and analytics identity stay in place. Repeat calls finish leftover rows.
+     */
+    public CompletableFuture<ScrubUserResponse> scrubUser(String userId) {
+        return this.rawClient.scrubUser(userId).thenApply(response -> response.body());
+    }
+
+    /**
+     * Replaces this user's message-adjacent text with a placeholder. Conversation rows, identifiers, flags, and analytics identity stay in place. Repeat calls finish leftover rows.
+     */
+    public CompletableFuture<ScrubUserResponse> scrubUser(String userId, RequestOptions requestOptions) {
+        return this.rawClient.scrubUser(userId, requestOptions).thenApply(response -> response.body());
+    }
+
+    /**
+     * Replaces this user's message-adjacent text with a placeholder. Conversation rows, identifiers, flags, and analytics identity stay in place. Repeat calls finish leftover rows.
+     */
+    public CompletableFuture<ScrubUserResponse> scrubUser(String userId, ScrubUserRequest request) {
+        return this.rawClient.scrubUser(userId, request).thenApply(response -> response.body());
+    }
+
+    /**
+     * Replaces this user's message-adjacent text with a placeholder. Conversation rows, identifiers, flags, and analytics identity stay in place. Repeat calls finish leftover rows.
+     */
+    public CompletableFuture<ScrubUserResponse> scrubUser(
+            String userId, ScrubUserRequest request, RequestOptions requestOptions) {
+        return this.rawClient.scrubUser(userId, request, requestOptions).thenApply(response -> response.body());
+    }
+
+    /**
+     * Redacts detected personal data in this user's message-adjacent text with regex, then an optional hosted redaction service when the Agent has that option on. Conversation rows, identifiers, flags, and analytics identity stay in place. Repeat calls finish leftover rows and skip text that is already redacted.
+     */
+    public CompletableFuture<AnonymizeUserResponse> anonymizeUser(String userId) {
+        return this.rawClient.anonymizeUser(userId).thenApply(response -> response.body());
+    }
+
+    /**
+     * Redacts detected personal data in this user's message-adjacent text with regex, then an optional hosted redaction service when the Agent has that option on. Conversation rows, identifiers, flags, and analytics identity stay in place. Repeat calls finish leftover rows and skip text that is already redacted.
+     */
+    public CompletableFuture<AnonymizeUserResponse> anonymizeUser(String userId, RequestOptions requestOptions) {
+        return this.rawClient.anonymizeUser(userId, requestOptions).thenApply(response -> response.body());
+    }
+
+    /**
+     * Redacts detected personal data in this user's message-adjacent text with regex, then an optional hosted redaction service when the Agent has that option on. Conversation rows, identifiers, flags, and analytics identity stay in place. Repeat calls finish leftover rows and skip text that is already redacted.
+     */
+    public CompletableFuture<AnonymizeUserResponse> anonymizeUser(String userId, AnonymizeUserRequest request) {
+        return this.rawClient.anonymizeUser(userId, request).thenApply(response -> response.body());
+    }
+
+    /**
+     * Redacts detected personal data in this user's message-adjacent text with regex, then an optional hosted redaction service when the Agent has that option on. Conversation rows, identifiers, flags, and analytics identity stay in place. Repeat calls finish leftover rows and skip text that is already redacted.
+     */
+    public CompletableFuture<AnonymizeUserResponse> anonymizeUser(
+            String userId, AnonymizeUserRequest request, RequestOptions requestOptions) {
+        return this.rawClient.anonymizeUser(userId, request, requestOptions).thenApply(response -> response.body());
     }
 }

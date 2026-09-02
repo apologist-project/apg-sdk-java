@@ -18,9 +18,11 @@ import ai.apologist.errors.InternalServerError;
 import ai.apologist.errors.NotFoundError;
 import ai.apologist.errors.ServiceUnavailableError;
 import ai.apologist.errors.UnauthorizedError;
+import ai.apologist.resources.channels.requests.GetChatwootChannelStatusRequest;
 import ai.apologist.resources.channels.requests.GetDiscordChannelStatusRequest;
 import ai.apologist.resources.channels.requests.GetInstagramPrivacyPolicyRequest;
 import ai.apologist.resources.channels.requests.GetLineChannelStatusRequest;
+import ai.apologist.resources.channels.requests.ReceiveChatwootWebhookRequest;
 import ai.apologist.resources.channels.requests.ReceiveDiscordInteractionRequest;
 import ai.apologist.resources.channels.requests.ReceiveFacebookMessageRequest;
 import ai.apologist.resources.channels.requests.ReceiveLineWebhookRequest;
@@ -29,6 +31,7 @@ import ai.apologist.resources.channels.requests.ReceiveTwilioMessageRequest;
 import ai.apologist.resources.channels.requests.ReceiveWhatsAppMessageRequest;
 import ai.apologist.resources.channels.requests.VerifyFacebookWebhookRequest;
 import ai.apologist.resources.channels.requests.VerifyWhatsAppWebhookRequest;
+import ai.apologist.resources.channels.types.GetChatwootChannelStatusResponse;
 import ai.apologist.resources.channels.types.GetDiscordChannelStatusResponse;
 import ai.apologist.resources.channels.types.GetLineChannelStatusResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -48,6 +51,196 @@ public class RawChannelsClient {
 
     public RawChannelsClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
+    }
+
+    /**
+     * Returns the status of the Chatwoot channel. Used as a lightweight health/verification endpoint.
+     */
+    public AgentClientHttpResponse<GetChatwootChannelStatusResponse> getChatwootChannelStatus(String id) {
+        return getChatwootChannelStatus(
+                id, GetChatwootChannelStatusRequest.builder().build());
+    }
+
+    /**
+     * Returns the status of the Chatwoot channel. Used as a lightweight health/verification endpoint.
+     */
+    public AgentClientHttpResponse<GetChatwootChannelStatusResponse> getChatwootChannelStatus(
+            String id, RequestOptions requestOptions) {
+        return getChatwootChannelStatus(
+                id, GetChatwootChannelStatusRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Returns the status of the Chatwoot channel. Used as a lightweight health/verification endpoint.
+     */
+    public AgentClientHttpResponse<GetChatwootChannelStatusResponse> getChatwootChannelStatus(
+            String id, GetChatwootChannelStatusRequest request) {
+        return getChatwootChannelStatus(id, request, null);
+    }
+
+    /**
+     * Returns the status of the Chatwoot channel. Used as a lightweight health/verification endpoint.
+     */
+    public AgentClientHttpResponse<GetChatwootChannelStatusResponse> getChatwootChannelStatus(
+            String id, GetChatwootChannelStatusRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+                .newBuilder()
+                .addPathSegments("channels")
+                .addPathSegment(id)
+                .addPathSegments("chatwoot");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method("GET", null)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new AgentClientHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, GetChatwootChannelStatusResponse.class),
+                        response);
+            }
+            try {
+                if (response.code() == 404) {
+                    throw new NotFoundError(
+                            ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new AgentClientApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new AgentClientException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AgentClientException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Receives Chatwoot Agent Bot webhook events for the channel. Chatwoot owns the messaging inbox (Facebook, website widget, and others). This Agent replies through the Chatwoot API and maps native bot handoff to conversation pause/resume. Requests are verified via the <code>X-Chatwoot-Signature</code> HMAC-SHA256 header using the configured webhook secret unless an <code>api_key</code> is present and no secret is set. The route acknowledges immediately (Chatwoot times out in about 5 seconds) and processes events asynchronously.
+     */
+    public AgentClientHttpResponse<Void> receiveChatwootWebhook(String id, Map<String, Object> body) {
+        return receiveChatwootWebhook(
+                id, ReceiveChatwootWebhookRequest.builder().body(body).build());
+    }
+
+    /**
+     * Receives Chatwoot Agent Bot webhook events for the channel. Chatwoot owns the messaging inbox (Facebook, website widget, and others). This Agent replies through the Chatwoot API and maps native bot handoff to conversation pause/resume. Requests are verified via the <code>X-Chatwoot-Signature</code> HMAC-SHA256 header using the configured webhook secret unless an <code>api_key</code> is present and no secret is set. The route acknowledges immediately (Chatwoot times out in about 5 seconds) and processes events asynchronously.
+     */
+    public AgentClientHttpResponse<Void> receiveChatwootWebhook(
+            String id, Map<String, Object> body, RequestOptions requestOptions) {
+        return receiveChatwootWebhook(
+                id, ReceiveChatwootWebhookRequest.builder().body(body).build(), requestOptions);
+    }
+
+    /**
+     * Receives Chatwoot Agent Bot webhook events for the channel. Chatwoot owns the messaging inbox (Facebook, website widget, and others). This Agent replies through the Chatwoot API and maps native bot handoff to conversation pause/resume. Requests are verified via the <code>X-Chatwoot-Signature</code> HMAC-SHA256 header using the configured webhook secret unless an <code>api_key</code> is present and no secret is set. The route acknowledges immediately (Chatwoot times out in about 5 seconds) and processes events asynchronously.
+     */
+    public AgentClientHttpResponse<Void> receiveChatwootWebhook(String id, ReceiveChatwootWebhookRequest request) {
+        return receiveChatwootWebhook(id, request, null);
+    }
+
+    /**
+     * Receives Chatwoot Agent Bot webhook events for the channel. Chatwoot owns the messaging inbox (Facebook, website widget, and others). This Agent replies through the Chatwoot API and maps native bot handoff to conversation pause/resume. Requests are verified via the <code>X-Chatwoot-Signature</code> HMAC-SHA256 header using the configured webhook secret unless an <code>api_key</code> is present and no secret is set. The route acknowledges immediately (Chatwoot times out in about 5 seconds) and processes events asynchronously.
+     */
+    public AgentClientHttpResponse<Void> receiveChatwootWebhook(
+            String id, ReceiveChatwootWebhookRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+                .newBuilder()
+                .addPathSegments("channels")
+                .addPathSegment(id)
+                .addPathSegments("chatwoot");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        RequestBody body;
+        try {
+            body = RequestBody.create(
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request.getBody()), MediaTypes.APPLICATION_JSON);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", body)
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Accept", "application/json");
+        if (request.getChatwootSignature().isPresent()) {
+            _requestBuilder.addHeader(
+                    "X-Chatwoot-Signature", request.getChatwootSignature().get());
+        }
+        if (request.getChatwootTimestamp().isPresent()) {
+            _requestBuilder.addHeader(
+                    "X-Chatwoot-Timestamp", request.getChatwootTimestamp().get());
+        }
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            if (response.isSuccessful()) {
+                return new AgentClientHttpResponse<>(null, response);
+            }
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            try {
+                switch (response.code()) {
+                    case 400:
+                        throw new BadRequestError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 503:
+                        throw new ServiceUnavailableError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new AgentClientApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new AgentClientException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AgentClientException("Network error executing HTTP request", e);
+        }
     }
 
     /**
