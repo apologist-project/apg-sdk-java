@@ -16,8 +16,8 @@ import ai.apologist.errors.InternalServerError;
 import ai.apologist.errors.ServiceUnavailableError;
 import ai.apologist.errors.UnprocessableEntityError;
 import ai.apologist.resources.ctas.requests.CtaClickRequest;
+import ai.apologist.resources.ctas.requests.CtaMatchRequest;
 import ai.apologist.resources.ctas.types.MatchCtasResponse;
-import ai.apologist.types.CtaMatchRequest;
 import ai.apologist.types.Error;
 import ai.apologist.types.SuccessResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -35,6 +35,20 @@ public class RawCtAsClient {
 
     public RawCtAsClient(ClientOptions clientOptions) {
         this.clientOptions = clientOptions;
+    }
+
+    /**
+     * Finds matching CTAs based on conversation context, user, session, device, or messages
+     */
+    public AgentClientHttpResponse<MatchCtasResponse> matchCtas() {
+        return matchCtas(CtaMatchRequest.builder().build());
+    }
+
+    /**
+     * Finds matching CTAs based on conversation context, user, session, device, or messages
+     */
+    public AgentClientHttpResponse<MatchCtasResponse> matchCtas(RequestOptions requestOptions) {
+        return matchCtas(CtaMatchRequest.builder().build(), requestOptions);
     }
 
     /**

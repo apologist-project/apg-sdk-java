@@ -17,15 +17,19 @@ import ai.apologist.errors.InternalServerError;
 import ai.apologist.errors.NotFoundError;
 import ai.apologist.errors.ServiceUnavailableError;
 import ai.apologist.errors.UnprocessableEntityError;
+import ai.apologist.resources.chat.requests.AnonymizeCompletionRequest;
+import ai.apologist.resources.chat.requests.ChatCompletionRequest;
 import ai.apologist.resources.chat.requests.FeedbackRequest;
 import ai.apologist.resources.chat.requests.FlagRequest;
 import ai.apologist.resources.chat.requests.GetChatCompletionRequest;
 import ai.apologist.resources.chat.requests.LikeRequest;
 import ai.apologist.resources.chat.requests.ListChatCompletionsRequest;
+import ai.apologist.resources.chat.requests.ScrubCompletionRequest;
 import ai.apologist.resources.chat.requests.ShareRequest;
+import ai.apologist.resources.chat.types.AnonymizeCompletionResponse;
 import ai.apologist.resources.chat.types.GetChatCompletionResponse;
 import ai.apologist.resources.chat.types.ListChatCompletionsResponse;
-import ai.apologist.types.ChatCompletionRequest;
+import ai.apologist.resources.chat.types.ScrubCompletionResponse;
 import ai.apologist.types.ChatCompletionResponse;
 import ai.apologist.types.Error;
 import ai.apologist.types.SuccessResponse;
@@ -158,6 +162,15 @@ public class RawChatClient {
                 .method("GET", null)
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Accept", "application/json");
+        if (request.getTraceparent().isPresent()) {
+            _requestBuilder.addHeader("traceparent", request.getTraceparent().get());
+        }
+        if (request.getTracestate().isPresent()) {
+            _requestBuilder.addHeader("tracestate", request.getTracestate().get());
+        }
+        if (request.getBaggage().isPresent()) {
+            _requestBuilder.addHeader("baggage", request.getBaggage().get());
+        }
         Request okhttpRequest = _requestBuilder.build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
@@ -205,6 +218,20 @@ public class RawChatClient {
     /**
      * Creates a chat completion using the agent's configured model. Supports both streaming and non-streaming responses.
      */
+    public AgentClientHttpResponse<ChatCompletionResponse> createChatCompletion() {
+        return createChatCompletion(ChatCompletionRequest.builder().build());
+    }
+
+    /**
+     * Creates a chat completion using the agent's configured model. Supports both streaming and non-streaming responses.
+     */
+    public AgentClientHttpResponse<ChatCompletionResponse> createChatCompletion(RequestOptions requestOptions) {
+        return createChatCompletion(ChatCompletionRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Creates a chat completion using the agent's configured model. Supports both streaming and non-streaming responses.
+     */
     public AgentClientHttpResponse<ChatCompletionResponse> createChatCompletion(ChatCompletionRequest request) {
         return createChatCompletion(request, null);
     }
@@ -226,16 +253,25 @@ public class RawChatClient {
         try {
             body = RequestBody.create(
                     ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
-        } catch (JsonProcessingException e) {
-            throw new AgentClientException("Failed to serialize request", e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        Request okhttpRequest = new Request.Builder()
+        Request.Builder _requestBuilder = new Request.Builder()
                 .url(httpUrl.build())
                 .method("POST", body)
                 .headers(Headers.of(clientOptions.headers(requestOptions)))
                 .addHeader("Content-Type", "application/json")
-                .addHeader("Accept", "application/json")
-                .build();
+                .addHeader("Accept", "application/json");
+        if (request.getTraceparent().isPresent()) {
+            _requestBuilder.addHeader("traceparent", request.getTraceparent().get());
+        }
+        if (request.getTracestate().isPresent()) {
+            _requestBuilder.addHeader("tracestate", request.getTracestate().get());
+        }
+        if (request.getBaggage().isPresent()) {
+            _requestBuilder.addHeader("baggage", request.getBaggage().get());
+        }
+        Request okhttpRequest = _requestBuilder.build();
         OkHttpClient client = clientOptions.httpClient();
         if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
             client = clientOptions.httpClientWithTimeout(requestOptions);
@@ -605,6 +641,184 @@ public class RawChatClient {
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Error.class), response);
                     case 503:
                         throw new ServiceUnavailableError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new AgentClientApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new AgentClientException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AgentClientException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Replaces this chat completion's message-adjacent text with a placeholder. Conversation rows, identifiers, likes, flags, and analytics identity stay in place. Repeat calls finish leftover rows.
+     */
+    public AgentClientHttpResponse<ScrubCompletionResponse> scrubCompletion(String id) {
+        return scrubCompletion(id, ScrubCompletionRequest.builder().build());
+    }
+
+    /**
+     * Replaces this chat completion's message-adjacent text with a placeholder. Conversation rows, identifiers, likes, flags, and analytics identity stay in place. Repeat calls finish leftover rows.
+     */
+    public AgentClientHttpResponse<ScrubCompletionResponse> scrubCompletion(String id, RequestOptions requestOptions) {
+        return scrubCompletion(id, ScrubCompletionRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Replaces this chat completion's message-adjacent text with a placeholder. Conversation rows, identifiers, likes, flags, and analytics identity stay in place. Repeat calls finish leftover rows.
+     */
+    public AgentClientHttpResponse<ScrubCompletionResponse> scrubCompletion(String id, ScrubCompletionRequest request) {
+        return scrubCompletion(id, request, null);
+    }
+
+    /**
+     * Replaces this chat completion's message-adjacent text with a placeholder. Conversation rows, identifiers, likes, flags, and analytics identity stay in place. Repeat calls finish leftover rows.
+     */
+    public AgentClientHttpResponse<ScrubCompletionResponse> scrubCompletion(
+            String id, ScrubCompletionRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+                .newBuilder()
+                .addPathSegments("chat/completions")
+                .addPathSegment(id)
+                .addPathSegments("scrub");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", RequestBody.create("", null))
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new AgentClientHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, ScrubCompletionResponse.class),
+                        response);
+            }
+            try {
+                switch (response.code()) {
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 404:
+                        throw new NotFoundError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 500:
+                        throw new InternalServerError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                }
+            } catch (JsonProcessingException ignored) {
+                // unable to map error response, throwing generic error
+            }
+            Object errorBody = ObjectMappers.parseErrorBody(responseBodyString);
+            throw new AgentClientApiException(
+                    "Error with status code " + response.code(), response.code(), errorBody, response);
+        } catch (JsonProcessingException e) {
+            throw new AgentClientException("Failed to deserialize response: " + e.getMessage(), e);
+        } catch (IOException e) {
+            throw new AgentClientException("Network error executing HTTP request", e);
+        }
+    }
+
+    /**
+     * Redacts detected personal data in this chat completion's message-adjacent text with regex, then an optional hosted redaction service when the Agent has that option on. Conversation rows, identifiers, likes, flags, and analytics identity stay in place. Repeat calls finish leftover rows and skip text that is already redacted.
+     */
+    public AgentClientHttpResponse<AnonymizeCompletionResponse> anonymizeCompletion(String id) {
+        return anonymizeCompletion(id, AnonymizeCompletionRequest.builder().build());
+    }
+
+    /**
+     * Redacts detected personal data in this chat completion's message-adjacent text with regex, then an optional hosted redaction service when the Agent has that option on. Conversation rows, identifiers, likes, flags, and analytics identity stay in place. Repeat calls finish leftover rows and skip text that is already redacted.
+     */
+    public AgentClientHttpResponse<AnonymizeCompletionResponse> anonymizeCompletion(
+            String id, RequestOptions requestOptions) {
+        return anonymizeCompletion(id, AnonymizeCompletionRequest.builder().build(), requestOptions);
+    }
+
+    /**
+     * Redacts detected personal data in this chat completion's message-adjacent text with regex, then an optional hosted redaction service when the Agent has that option on. Conversation rows, identifiers, likes, flags, and analytics identity stay in place. Repeat calls finish leftover rows and skip text that is already redacted.
+     */
+    public AgentClientHttpResponse<AnonymizeCompletionResponse> anonymizeCompletion(
+            String id, AnonymizeCompletionRequest request) {
+        return anonymizeCompletion(id, request, null);
+    }
+
+    /**
+     * Redacts detected personal data in this chat completion's message-adjacent text with regex, then an optional hosted redaction service when the Agent has that option on. Conversation rows, identifiers, likes, flags, and analytics identity stay in place. Repeat calls finish leftover rows and skip text that is already redacted.
+     */
+    public AgentClientHttpResponse<AnonymizeCompletionResponse> anonymizeCompletion(
+            String id, AnonymizeCompletionRequest request, RequestOptions requestOptions) {
+        HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
+                .newBuilder()
+                .addPathSegments("chat/completions")
+                .addPathSegment(id)
+                .addPathSegments("anonymize");
+        if (requestOptions != null) {
+            requestOptions.getQueryParameters().forEach((_key, _value) -> {
+                httpUrl.addQueryParameter(_key, _value);
+            });
+        }
+        Request.Builder _requestBuilder = new Request.Builder()
+                .url(httpUrl.build())
+                .method("POST", RequestBody.create("", null))
+                .headers(Headers.of(clientOptions.headers(requestOptions)))
+                .addHeader("Accept", "application/json");
+        Request okhttpRequest = _requestBuilder.build();
+        OkHttpClient client = clientOptions.httpClient();
+        if (requestOptions != null && requestOptions.getTimeout().isPresent()) {
+            client = clientOptions.httpClientWithTimeout(requestOptions);
+        }
+        if (requestOptions != null && requestOptions.getMaxRetries().isPresent()) {
+            okhttpRequest = okhttpRequest
+                    .newBuilder()
+                    .tag(
+                            RetryInterceptor.MaxRetriesOverride.class,
+                            new RetryInterceptor.MaxRetriesOverride(
+                                    requestOptions.getMaxRetries().get()))
+                    .build();
+        }
+        try (Response response = client.newCall(okhttpRequest).execute()) {
+            ResponseBody responseBody = response.body();
+            String responseBodyString = responseBody != null ? responseBody.string() : "{}";
+            if (response.isSuccessful()) {
+                return new AgentClientHttpResponse<>(
+                        ObjectMappers.JSON_MAPPER.readValue(responseBodyString, AnonymizeCompletionResponse.class),
+                        response);
+            }
+            try {
+                switch (response.code()) {
+                    case 403:
+                        throw new ForbiddenError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 404:
+                        throw new NotFoundError(
+                                ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
+                    case 500:
+                        throw new InternalServerError(
                                 ObjectMappers.JSON_MAPPER.readValue(responseBodyString, Object.class), response);
                 }
             } catch (JsonProcessingException ignored) {

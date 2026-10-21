@@ -30,6 +30,7 @@ Returns a paginated list of chat completions (prompts) for the agent, with appli
 client.chat().listChatCompletions(
     ListChatCompletionsRequest
         .builder()
+        .traceparent("00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01")
         .build()
 );
 ```
@@ -186,6 +187,30 @@ client.chat().listChatCompletions(
     
 </dd>
 </dl>
+
+<dl>
+<dd>
+
+**traceparent:** `Optional<String>` — W3C Trace Context parent. When present, the Agent continues this trace for the request. Applies to all `/api/v1` endpoints.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tracestate:** `Optional<String>` — Optional W3C tracestate associated with traceparent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**baggage:** `Optional<String>` — Optional W3C baggage. Prompt text is never copied onto spans.
+    
+</dd>
+</dl>
 </dd>
 </dl>
 
@@ -222,9 +247,10 @@ Creates a chat completion using the agent's configured model. Supports both stre
 
 ```java
 client.chat().createChatCompletion(
-    ChatCompletionRequest.of(new 
-    HashMap<String, Object>() {{put("key", "value");
-    }})
+    ChatCompletionRequest
+        .builder()
+        .traceparent("00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01")
+        .build()
 );
 ```
 </dd>
@@ -240,7 +266,263 @@ client.chat().createChatCompletion(
 <dl>
 <dd>
 
-**request:** `ChatCompletionRequest` 
+**traceparent:** `Optional<String>` — W3C Trace Context parent. When present, the Agent continues this trace for the request. Applies to all `/api/v1` endpoints.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tracestate:** `Optional<String>` — Optional W3C tracestate associated with traceparent.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**baggage:** `Optional<String>` — Optional W3C baggage. Prompt text is never copied onto spans.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**audio:** `Optional<Map<String, Object>>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**frequencyPenalty:** `Optional<Double>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**logitBias:** `Optional<Map<String, Object>>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**logprobs:** `Optional<ChatCompletionRequestLogprobs>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**topLogprobs:** `Optional<Integer>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**maxCompletionTokens:** `Optional<Integer>` — Output-token cap for this request. An API key may set this above the agent's Max Output Tokens. The value cannot exceed the model's maximum. Requests without an API key keep the agent's Max Output Tokens.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**maxTokens:** `Optional<Integer>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**messages:** `Optional<List<ChatMessage>>` — Chat messages in OpenAI format. Required when `prompt` is omitted.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**metadata:** `Optional<ChatCompletionRequestMetadata>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**modalities:** `Optional<List<Object>>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**model:** `Optional<String>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**n:** `Optional<Integer>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**parallelToolCalls:** `Optional<Boolean>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**prediction:** `Optional<Map<String, Object>>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**presencePenalty:** `Optional<Double>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**prompt:** `Optional<String>` — User text to complete. Required when `messages` is omitted.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**reasoningEffort:** `Optional<ChatCompletionRequestReasoningEffort>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**verbosity:** `Optional<ChatCompletionRequestVerbosity>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**responseFormat:** `Optional<ChatCompletionRequestResponseFormat>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**seed:** `Optional<Integer>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**serviceTier:** `Optional<String>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**stop:** `Optional<String>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**store:** `Optional<Boolean>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**stream:** `Optional<Boolean>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**streamOptions:** `Optional<Map<String, Object>>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**temperature:** `Optional<Double>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**topP:** `Optional<Double>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**tools:** `Optional<List<Object>>` — OpenAI-compatible function tool definitions. Passed through to the model as declaration-only tools (the client executes them and returns role=tool messages).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**toolChoice:** `Optional<ChatCompletionRequestToolChoice>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user:** `Optional<String>` 
     
 </dd>
 </dl>
@@ -539,6 +821,124 @@ client.chat().shareCompletion(
 </dl>
 </details>
 
+<details><summary><code>client.chat.scrubCompletion(id) -> ScrubCompletionResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Replaces this chat completion's message-adjacent text with a placeholder. Conversation rows, identifiers, likes, flags, and analytics identity stay in place. Repeat calls finish leftover rows.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.chat().scrubCompletion(
+    "id",
+    ScrubCompletionRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The numeric id or UUID of the chat completion
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.chat.anonymizeCompletion(id) -> AnonymizeCompletionResponse</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Redacts detected personal data in this chat completion's message-adjacent text with regex, then an optional hosted redaction service when the Agent has that option on. Conversation rows, identifiers, likes, flags, and analytics identity stay in place. Repeat calls finish leftover rows and skip text that is already redacted.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```java
+client.chat().anonymizeCompletion(
+    "id",
+    AnonymizeCompletionRequest
+        .builder()
+        .build()
+);
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `String` — The numeric id or UUID of the chat completion
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.chat.getChatCompletion(id) -> GetChatCompletionResponse</code></summary>
 <dl>
 <dd>
@@ -731,7 +1131,7 @@ client.corpus().logCorpusView(
 <dl>
 <dd>
 
-**model:** `String` — The model type (e.g., 'source')
+**model:** `String` — Listing model. One of collection, contributor, organization, or source.
     
 </dd>
 </dl>
@@ -816,7 +1216,7 @@ client.corpus().logCorpusImpression(
 <dl>
 <dd>
 
-**model:** `String` — The model type (e.g., 'source')
+**model:** `String` — Listing model. One of collection, contributor, organization, or source.
     
 </dd>
 </dl>
@@ -901,7 +1301,7 @@ client.corpus().logCorpusReferralRedirect(
 <dl>
 <dd>
 
-**model:** `String` — The model type (e.g., 'source')
+**model:** `String` — Listing model. One of collection, contributor, organization, or source.
     
 </dd>
 </dl>
@@ -994,7 +1394,7 @@ client.corpus().logCorpusReferral(
 <dl>
 <dd>
 
-**model:** `String` — The model type (e.g., 'source')
+**model:** `String` — Listing model. One of collection, contributor, organization, or source.
     
 </dd>
 </dl>
@@ -1260,7 +1660,7 @@ client.evaluators().evaluateContent(
 <dl>
 <dd>
 
-**content:** `EvaluatorRequestContent` 
+**content:** `EvaluatorRequestContent` — Text to evaluate, an array of strings, or chat messages.
     
 </dd>
 </dl>
@@ -1425,9 +1825,9 @@ Finds matching CTAs based on conversation context, user, session, device, or mes
 
 ```java
 client.ctAs().matchCtas(
-    CtaMatchRequest.of(new 
-    HashMap<String, Object>() {{put("key", "value");
-    }})
+    CtaMatchRequest
+        .builder()
+        .build()
 );
 ```
 </dd>
@@ -1443,7 +1843,71 @@ client.ctAs().matchCtas(
 <dl>
 <dd>
 
-**request:** `CtaMatchRequest` 
+**conversation:** `Optional<String>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**client:** `Optional<String>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**device:** `Optional<String>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**language:** `Optional<String>` — ISO language code, or `auto` to detect from the prompt.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**limit:** `Optional<Integer>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**messages:** `Optional<List<ChatMessage>>` — Chat messages in OpenAI format.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**session:** `Optional<String>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user:** `Optional<String>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**variables:** `Optional<Map<String, Optional<String>>>` — Flat string key/value pairs substituted into `{key}` placeholders in evaluator prompts run during CTA matching. Not persisted.
     
 </dd>
 </dl>
@@ -2116,7 +2580,7 @@ client.benchmarks().listBenchmarkRuns(
 <dl>
 <dd>
 
-Executes a benchmark run and returns the aggregated result with nested evaluators, questions, and a flat evaluations array.
+Executes a benchmark run and returns the aggregated result with nested evaluators, questions, and a flat evaluations array. A run that cannot finish inside one request returns 202 with `completed_at` null and continues in the background. Poll Get a benchmark run until `completed_at` is set.
 </dd>
 </dl>
 </dd>
@@ -2726,7 +3190,7 @@ client.channels().getChatwootChannelStatus(
 </dl>
 </details>
 
-<details><summary><code>client.channels.receiveChatwootWebhook(id, request)</code></summary>
+<details><summary><code>client.channels.receiveChatwootWebhook(channelId, request)</code></summary>
 <dl>
 <dd>
 
@@ -2754,13 +3218,55 @@ Receives Chatwoot Agent Bot webhook events for the channel. Chatwoot owns the me
 
 ```java
 client.channels().receiveChatwootWebhook(
-    "id",
-    ReceiveChatwootWebhookRequest
+    "91",
+    ChatwootWebhookPayload
         .builder()
-        .body(
-            new HashMap<String, Object>() {{
-                put("key", "value");
-            }}
+        .chatwootSignature("sha256=2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824")
+        .chatwootTimestamp("1710000000")
+        .event("message_created")
+        .id(9001)
+        .content("Hello from Messenger")
+        .messageType("incoming")
+        .private_(false)
+        .account(
+            ChatwootWebhookPayloadAccount
+                .builder()
+                .id(7)
+                .build()
+        )
+        .sender(
+            ChatwootWebhookPayloadSender
+                .builder()
+                .id(55)
+                .name("Pat")
+                .type("contact")
+                .build()
+        )
+        .conversation(
+            ChatwootWebhookPayloadConversation
+                .builder()
+                .id(42)
+                .status("pending")
+                .account(
+                    ChatwootWebhookPayloadConversationAccount
+                        .builder()
+                        .id(7)
+                        .build()
+                )
+                .meta(
+                    ChatwootConversationMeta
+                        .builder()
+                        .assigneeType("AgentBot")
+                        .sender(
+                            ChatwootConversationMetaSender
+                                .builder()
+                                .id(55)
+                                .name("Pat")
+                                .build()
+                        )
+                        .build()
+                )
+                .build()
         )
         .build()
 );
@@ -2778,7 +3284,7 @@ client.channels().receiveChatwootWebhook(
 <dl>
 <dd>
 
-**id:** `String` — The channel id
+**channelId:** `String` — The channel id
     
 </dd>
 </dl>
@@ -2802,7 +3308,79 @@ client.channels().receiveChatwootWebhook(
 <dl>
 <dd>
 
-**request:** `Map<String, Object>` — Chatwoot Agent Bot webhook payload (`event` plus message or conversation fields).
+**event:** `Optional<String>` — Chatwoot event name. Incoming visitor messages use `message_created`. Staff takeover and assignment use conversation events such as `conversation_opened`, `conversation_status_changed`, and `conversation_updated`.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**id:** `Optional<Integer>` — Message id on `message_*` events. Conversation display id on `conversation_*` events.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**content:** `Optional<String>` — Message text. Present on message events. Empty or private notes are ignored.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**messageType:** `Optional<String>` — Incoming visitor messages are `incoming` (or `0`). Staff replies are `outgoing` (or `1`).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**private_:** `Optional<Boolean>` — When true, the Agent ignores the message (Chatwoot private note).
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**account:** `Optional<ChatwootWebhookPayloadAccount>` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**sender:** `Optional<ChatwootWebhookPayloadSender>` — Present on message events.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**conversation:** `Optional<ChatwootWebhookPayloadConversation>` — Nested on message events. Conversation events send `id`, `status`, and `meta` at the top level instead.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**status:** `Optional<String>` — Top-level conversation status on conversation events.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**meta:** `Optional<ChatwootConversationMeta>` — Top-level conversation meta on conversation events.
     
 </dd>
 </dl>
@@ -3477,7 +4055,7 @@ client.channels().receiveTwilioMessage(
 <dl>
 <dd>
 
-Handles the Meta WhatsApp Cloud API webhook verification handshake, echoing `hub.challenge` when `hub.verify_token` matches the channel's configured token.
+Handles the Meta WhatsApp Cloud API webhook verification handshake. Requires an `api_key` query parameter or `x-api-key` header, then echoes `hub.challenge` when `hub.verify_token` matches the channel's configured token.
 </dd>
 </dl>
 </dd>
@@ -3562,7 +4140,7 @@ client.channels().verifyWhatsAppWebhook(
 <dl>
 <dd>
 
-Receives WhatsApp Cloud API message events for the channel. Payload shape is defined by Meta. Signature verification via `x-hub-signature-256` is used when the channel has an App Secret configured; otherwise the webhook relies on URL secrecy and/or an `api_key` query parameter.
+Receives WhatsApp Cloud API message events for the channel. Payload shape is defined by Meta. An `api_key` query parameter or `x-api-key` header is required. Signature verification via `x-hub-signature-256` is also required when the channel has an App Secret configured.
 </dd>
 </dl>
 </dd>
@@ -3610,7 +4188,7 @@ client.channels().receiveWhatsAppMessage(
 <dl>
 <dd>
 
-**hubSignature256:** `Optional<String>` — Meta `sha256=<hex>` HMAC of the raw body keyed with the WhatsApp App Secret. Required when the channel has an App Secret configured and the webhook URL does not include an api_key.
+**hubSignature256:** `Optional<String>` — Meta `sha256=<hex>` HMAC of the raw body keyed with the WhatsApp App Secret. Required when the channel has an App Secret configured.
     
 </dd>
 </dl>

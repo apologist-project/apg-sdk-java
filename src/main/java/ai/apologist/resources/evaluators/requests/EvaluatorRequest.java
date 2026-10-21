@@ -90,6 +90,9 @@ public final class EvaluatorRequest {
         return confidenceThreshold;
     }
 
+    /**
+     * @return Text to evaluate, an array of strings, or chat messages.
+     */
     @JsonProperty("content")
     public EvaluatorRequestContent getContent() {
         return content;
@@ -257,6 +260,9 @@ public final class EvaluatorRequest {
     }
 
     public interface ContentStage {
+        /**
+         * <p>Text to evaluate, an array of strings, or chat messages.</p>
+         */
         _FinalStage content(@NotNull EvaluatorRequestContent content);
 
         Builder from(EvaluatorRequest other);
@@ -369,6 +375,10 @@ public final class EvaluatorRequest {
             return this;
         }
 
+        /**
+         * <p>Text to evaluate, an array of strings, or chat messages.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
         @java.lang.Override
         @JsonSetter("content")
         public _FinalStage content(@NotNull EvaluatorRequestContent content) {

@@ -5,15 +5,19 @@ package ai.apologist.resources.chat;
 
 import ai.apologist.core.ClientOptions;
 import ai.apologist.core.RequestOptions;
+import ai.apologist.resources.chat.requests.AnonymizeCompletionRequest;
+import ai.apologist.resources.chat.requests.ChatCompletionRequest;
 import ai.apologist.resources.chat.requests.FeedbackRequest;
 import ai.apologist.resources.chat.requests.FlagRequest;
 import ai.apologist.resources.chat.requests.GetChatCompletionRequest;
 import ai.apologist.resources.chat.requests.LikeRequest;
 import ai.apologist.resources.chat.requests.ListChatCompletionsRequest;
+import ai.apologist.resources.chat.requests.ScrubCompletionRequest;
 import ai.apologist.resources.chat.requests.ShareRequest;
+import ai.apologist.resources.chat.types.AnonymizeCompletionResponse;
 import ai.apologist.resources.chat.types.GetChatCompletionResponse;
 import ai.apologist.resources.chat.types.ListChatCompletionsResponse;
-import ai.apologist.types.ChatCompletionRequest;
+import ai.apologist.resources.chat.types.ScrubCompletionResponse;
 import ai.apologist.types.ChatCompletionResponse;
 import ai.apologist.types.SuccessResponse;
 import java.util.concurrent.CompletableFuture;
@@ -62,6 +66,20 @@ public class AsyncChatClient {
     public CompletableFuture<ListChatCompletionsResponse> listChatCompletions(
             ListChatCompletionsRequest request, RequestOptions requestOptions) {
         return this.rawClient.listChatCompletions(request, requestOptions).thenApply(response -> response.body());
+    }
+
+    /**
+     * Creates a chat completion using the agent's configured model. Supports both streaming and non-streaming responses.
+     */
+    public CompletableFuture<ChatCompletionResponse> createChatCompletion() {
+        return this.rawClient.createChatCompletion().thenApply(response -> response.body());
+    }
+
+    /**
+     * Creates a chat completion using the agent's configured model. Supports both streaming and non-streaming responses.
+     */
+    public CompletableFuture<ChatCompletionResponse> createChatCompletion(RequestOptions requestOptions) {
+        return this.rawClient.createChatCompletion(requestOptions).thenApply(response -> response.body());
     }
 
     /**
@@ -151,6 +169,66 @@ public class AsyncChatClient {
     public CompletableFuture<SuccessResponse> shareCompletion(
             String id, ShareRequest request, RequestOptions requestOptions) {
         return this.rawClient.shareCompletion(id, request, requestOptions).thenApply(response -> response.body());
+    }
+
+    /**
+     * Replaces this chat completion's message-adjacent text with a placeholder. Conversation rows, identifiers, likes, flags, and analytics identity stay in place. Repeat calls finish leftover rows.
+     */
+    public CompletableFuture<ScrubCompletionResponse> scrubCompletion(String id) {
+        return this.rawClient.scrubCompletion(id).thenApply(response -> response.body());
+    }
+
+    /**
+     * Replaces this chat completion's message-adjacent text with a placeholder. Conversation rows, identifiers, likes, flags, and analytics identity stay in place. Repeat calls finish leftover rows.
+     */
+    public CompletableFuture<ScrubCompletionResponse> scrubCompletion(String id, RequestOptions requestOptions) {
+        return this.rawClient.scrubCompletion(id, requestOptions).thenApply(response -> response.body());
+    }
+
+    /**
+     * Replaces this chat completion's message-adjacent text with a placeholder. Conversation rows, identifiers, likes, flags, and analytics identity stay in place. Repeat calls finish leftover rows.
+     */
+    public CompletableFuture<ScrubCompletionResponse> scrubCompletion(String id, ScrubCompletionRequest request) {
+        return this.rawClient.scrubCompletion(id, request).thenApply(response -> response.body());
+    }
+
+    /**
+     * Replaces this chat completion's message-adjacent text with a placeholder. Conversation rows, identifiers, likes, flags, and analytics identity stay in place. Repeat calls finish leftover rows.
+     */
+    public CompletableFuture<ScrubCompletionResponse> scrubCompletion(
+            String id, ScrubCompletionRequest request, RequestOptions requestOptions) {
+        return this.rawClient.scrubCompletion(id, request, requestOptions).thenApply(response -> response.body());
+    }
+
+    /**
+     * Redacts detected personal data in this chat completion's message-adjacent text with regex, then an optional hosted redaction service when the Agent has that option on. Conversation rows, identifiers, likes, flags, and analytics identity stay in place. Repeat calls finish leftover rows and skip text that is already redacted.
+     */
+    public CompletableFuture<AnonymizeCompletionResponse> anonymizeCompletion(String id) {
+        return this.rawClient.anonymizeCompletion(id).thenApply(response -> response.body());
+    }
+
+    /**
+     * Redacts detected personal data in this chat completion's message-adjacent text with regex, then an optional hosted redaction service when the Agent has that option on. Conversation rows, identifiers, likes, flags, and analytics identity stay in place. Repeat calls finish leftover rows and skip text that is already redacted.
+     */
+    public CompletableFuture<AnonymizeCompletionResponse> anonymizeCompletion(
+            String id, RequestOptions requestOptions) {
+        return this.rawClient.anonymizeCompletion(id, requestOptions).thenApply(response -> response.body());
+    }
+
+    /**
+     * Redacts detected personal data in this chat completion's message-adjacent text with regex, then an optional hosted redaction service when the Agent has that option on. Conversation rows, identifiers, likes, flags, and analytics identity stay in place. Repeat calls finish leftover rows and skip text that is already redacted.
+     */
+    public CompletableFuture<AnonymizeCompletionResponse> anonymizeCompletion(
+            String id, AnonymizeCompletionRequest request) {
+        return this.rawClient.anonymizeCompletion(id, request).thenApply(response -> response.body());
+    }
+
+    /**
+     * Redacts detected personal data in this chat completion's message-adjacent text with regex, then an optional hosted redaction service when the Agent has that option on. Conversation rows, identifiers, likes, flags, and analytics identity stay in place. Repeat calls finish leftover rows and skip text that is already redacted.
+     */
+    public CompletableFuture<AnonymizeCompletionResponse> anonymizeCompletion(
+            String id, AnonymizeCompletionRequest request, RequestOptions requestOptions) {
+        return this.rawClient.anonymizeCompletion(id, request, requestOptions).thenApply(response -> response.body());
     }
 
     /**

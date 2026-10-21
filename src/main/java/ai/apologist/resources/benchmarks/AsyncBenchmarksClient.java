@@ -60,28 +60,28 @@ public class AsyncBenchmarksClient {
     }
 
     /**
-     * Executes a benchmark run and returns the aggregated result with nested evaluators, questions, and a flat evaluations array.
+     * Executes a benchmark run and returns the aggregated result with nested evaluators, questions, and a flat evaluations array. A run that cannot finish inside one request returns 202 with <code>completed_at</code> null and continues in the background. Poll Get a benchmark run until <code>completed_at</code> is set.
      */
     public CompletableFuture<Map<String, Object>> runBenchmark(String id) {
         return this.rawClient.runBenchmark(id).thenApply(response -> response.body());
     }
 
     /**
-     * Executes a benchmark run and returns the aggregated result with nested evaluators, questions, and a flat evaluations array.
+     * Executes a benchmark run and returns the aggregated result with nested evaluators, questions, and a flat evaluations array. A run that cannot finish inside one request returns 202 with <code>completed_at</code> null and continues in the background. Poll Get a benchmark run until <code>completed_at</code> is set.
      */
     public CompletableFuture<Map<String, Object>> runBenchmark(String id, RequestOptions requestOptions) {
         return this.rawClient.runBenchmark(id, requestOptions).thenApply(response -> response.body());
     }
 
     /**
-     * Executes a benchmark run and returns the aggregated result with nested evaluators, questions, and a flat evaluations array.
+     * Executes a benchmark run and returns the aggregated result with nested evaluators, questions, and a flat evaluations array. A run that cannot finish inside one request returns 202 with <code>completed_at</code> null and continues in the background. Poll Get a benchmark run until <code>completed_at</code> is set.
      */
     public CompletableFuture<Map<String, Object>> runBenchmark(String id, BenchmarkRunRequest request) {
         return this.rawClient.runBenchmark(id, request).thenApply(response -> response.body());
     }
 
     /**
-     * Executes a benchmark run and returns the aggregated result with nested evaluators, questions, and a flat evaluations array.
+     * Executes a benchmark run and returns the aggregated result with nested evaluators, questions, and a flat evaluations array. A run that cannot finish inside one request returns 202 with <code>completed_at</code> null and continues in the background. Poll Get a benchmark run until <code>completed_at</code> is set.
      */
     public CompletableFuture<Map<String, Object>> runBenchmark(
             String id, BenchmarkRunRequest request, RequestOptions requestOptions) {

@@ -23,6 +23,9 @@ public final class WebhookEventInfoKey {
     public static final WebhookEventInfoKey GUARDRAIL_TRIGGER =
             new WebhookEventInfoKey(Value.GUARDRAIL_TRIGGER, "guardrail_trigger");
 
+    public static final WebhookEventInfoKey AUTOMATION_TRIGGER =
+            new WebhookEventInfoKey(Value.AUTOMATION_TRIGGER, "automation_trigger");
+
     public static final WebhookEventInfoKey ATTRIBUTION_CLICK =
             new WebhookEventInfoKey(Value.ATTRIBUTION_CLICK, "attribution_click");
 
@@ -97,6 +100,8 @@ public final class WebhookEventInfoKey {
                 return visitor.visitPromptSubmit();
             case GUARDRAIL_TRIGGER:
                 return visitor.visitGuardrailTrigger();
+            case AUTOMATION_TRIGGER:
+                return visitor.visitAutomationTrigger();
             case ATTRIBUTION_CLICK:
                 return visitor.visitAttributionClick();
             case NEW_USER:
@@ -142,6 +147,8 @@ public final class WebhookEventInfoKey {
                 return PROMPT_SUBMIT;
             case "guardrail_trigger":
                 return GUARDRAIL_TRIGGER;
+            case "automation_trigger":
+                return AUTOMATION_TRIGGER;
             case "attribution_click":
                 return ATTRIBUTION_CLICK;
             case "new_user":
@@ -177,6 +184,8 @@ public final class WebhookEventInfoKey {
         RESPONSE_START,
 
         RESPONSE_END,
+
+        AUTOMATION_TRIGGER,
 
         AUTOMATIONS_END,
 
@@ -217,6 +226,8 @@ public final class WebhookEventInfoKey {
         T visitResponseStart();
 
         T visitResponseEnd();
+
+        T visitAutomationTrigger();
 
         T visitAutomationsEnd();
 

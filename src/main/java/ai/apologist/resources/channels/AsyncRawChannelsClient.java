@@ -18,11 +18,11 @@ import ai.apologist.errors.InternalServerError;
 import ai.apologist.errors.NotFoundError;
 import ai.apologist.errors.ServiceUnavailableError;
 import ai.apologist.errors.UnauthorizedError;
+import ai.apologist.resources.channels.requests.ChatwootWebhookPayload;
 import ai.apologist.resources.channels.requests.GetChatwootChannelStatusRequest;
 import ai.apologist.resources.channels.requests.GetDiscordChannelStatusRequest;
 import ai.apologist.resources.channels.requests.GetInstagramPrivacyPolicyRequest;
 import ai.apologist.resources.channels.requests.GetLineChannelStatusRequest;
-import ai.apologist.resources.channels.requests.ReceiveChatwootWebhookRequest;
 import ai.apologist.resources.channels.requests.ReceiveDiscordInteractionRequest;
 import ai.apologist.resources.channels.requests.ReceiveFacebookMessageRequest;
 import ai.apologist.resources.channels.requests.ReceiveLineWebhookRequest;
@@ -162,38 +162,37 @@ public class AsyncRawChannelsClient {
     /**
      * Receives Chatwoot Agent Bot webhook events for the channel. Chatwoot owns the messaging inbox (Facebook, website widget, and others). This Agent replies through the Chatwoot API and maps native bot handoff to conversation pause/resume. Requests are verified via the <code>X-Chatwoot-Signature</code> HMAC-SHA256 header using the configured webhook secret unless an <code>api_key</code> is present and no secret is set. The route acknowledges immediately (Chatwoot times out in about 5 seconds) and processes events asynchronously.
      */
-    public CompletableFuture<AgentClientHttpResponse<Void>> receiveChatwootWebhook(
-            String id, Map<String, Object> body) {
+    public CompletableFuture<AgentClientHttpResponse<Void>> receiveChatwootWebhook(String channelId) {
         return receiveChatwootWebhook(
-                id, ReceiveChatwootWebhookRequest.builder().body(body).build());
+                channelId, ChatwootWebhookPayload.builder().build());
     }
 
     /**
      * Receives Chatwoot Agent Bot webhook events for the channel. Chatwoot owns the messaging inbox (Facebook, website widget, and others). This Agent replies through the Chatwoot API and maps native bot handoff to conversation pause/resume. Requests are verified via the <code>X-Chatwoot-Signature</code> HMAC-SHA256 header using the configured webhook secret unless an <code>api_key</code> is present and no secret is set. The route acknowledges immediately (Chatwoot times out in about 5 seconds) and processes events asynchronously.
      */
     public CompletableFuture<AgentClientHttpResponse<Void>> receiveChatwootWebhook(
-            String id, Map<String, Object> body, RequestOptions requestOptions) {
+            String channelId, RequestOptions requestOptions) {
         return receiveChatwootWebhook(
-                id, ReceiveChatwootWebhookRequest.builder().body(body).build(), requestOptions);
+                channelId, ChatwootWebhookPayload.builder().build(), requestOptions);
     }
 
     /**
      * Receives Chatwoot Agent Bot webhook events for the channel. Chatwoot owns the messaging inbox (Facebook, website widget, and others). This Agent replies through the Chatwoot API and maps native bot handoff to conversation pause/resume. Requests are verified via the <code>X-Chatwoot-Signature</code> HMAC-SHA256 header using the configured webhook secret unless an <code>api_key</code> is present and no secret is set. The route acknowledges immediately (Chatwoot times out in about 5 seconds) and processes events asynchronously.
      */
     public CompletableFuture<AgentClientHttpResponse<Void>> receiveChatwootWebhook(
-            String id, ReceiveChatwootWebhookRequest request) {
-        return receiveChatwootWebhook(id, request, null);
+            String channelId, ChatwootWebhookPayload request) {
+        return receiveChatwootWebhook(channelId, request, null);
     }
 
     /**
      * Receives Chatwoot Agent Bot webhook events for the channel. Chatwoot owns the messaging inbox (Facebook, website widget, and others). This Agent replies through the Chatwoot API and maps native bot handoff to conversation pause/resume. Requests are verified via the <code>X-Chatwoot-Signature</code> HMAC-SHA256 header using the configured webhook secret unless an <code>api_key</code> is present and no secret is set. The route acknowledges immediately (Chatwoot times out in about 5 seconds) and processes events asynchronously.
      */
     public CompletableFuture<AgentClientHttpResponse<Void>> receiveChatwootWebhook(
-            String id, ReceiveChatwootWebhookRequest request, RequestOptions requestOptions) {
+            String channelId, ChatwootWebhookPayload request, RequestOptions requestOptions) {
         HttpUrl.Builder httpUrl = HttpUrl.parse(this.clientOptions.environment().getUrl())
                 .newBuilder()
                 .addPathSegments("channels")
-                .addPathSegment(id)
+                .addPathSegment(channelId)
                 .addPathSegments("chatwoot");
         if (requestOptions != null) {
             requestOptions.getQueryParameters().forEach((_key, _value) -> {
@@ -203,7 +202,7 @@ public class AsyncRawChannelsClient {
         RequestBody body;
         try {
             body = RequestBody.create(
-                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request.getBody()), MediaTypes.APPLICATION_JSON);
+                    ObjectMappers.JSON_MAPPER.writeValueAsBytes(request), MediaTypes.APPLICATION_JSON);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -1208,7 +1207,7 @@ public class AsyncRawChannelsClient {
     }
 
     /**
-     * Handles the Meta WhatsApp Cloud API webhook verification handshake, echoing <code>hub.challenge</code> when <code>hub.verify_token</code> matches the channel's configured token.
+     * Handles the Meta WhatsApp Cloud API webhook verification handshake. Requires an <code>api_key</code> query parameter or <code>x-api-key</code> header, then echoes <code>hub.challenge</code> when <code>hub.verify_token</code> matches the channel's configured token.
      */
     public CompletableFuture<AgentClientHttpResponse<String>> verifyWhatsAppWebhook(
             String id, VerifyWhatsAppWebhookRequest request) {
@@ -1216,7 +1215,7 @@ public class AsyncRawChannelsClient {
     }
 
     /**
-     * Handles the Meta WhatsApp Cloud API webhook verification handshake, echoing <code>hub.challenge</code> when <code>hub.verify_token</code> matches the channel's configured token.
+     * Handles the Meta WhatsApp Cloud API webhook verification handshake. Requires an <code>api_key</code> query parameter or <code>x-api-key</code> header, then echoes <code>hub.challenge</code> when <code>hub.verify_token</code> matches the channel's configured token.
      */
     public CompletableFuture<AgentClientHttpResponse<String>> verifyWhatsAppWebhook(
             String id, VerifyWhatsAppWebhookRequest request, RequestOptions requestOptions) {
@@ -1307,7 +1306,7 @@ public class AsyncRawChannelsClient {
     }
 
     /**
-     * Receives WhatsApp Cloud API message events for the channel. Payload shape is defined by Meta. Signature verification via <code>x-hub-signature-256</code> is used when the channel has an App Secret configured; otherwise the webhook relies on URL secrecy and/or an <code>api_key</code> query parameter.
+     * Receives WhatsApp Cloud API message events for the channel. Payload shape is defined by Meta. An <code>api_key</code> query parameter or <code>x-api-key</code> header is required. Signature verification via <code>x-hub-signature-256</code> is also required when the channel has an App Secret configured.
      */
     public CompletableFuture<AgentClientHttpResponse<Void>> receiveWhatsAppMessage(
             String id, Map<String, Object> body) {
@@ -1316,7 +1315,7 @@ public class AsyncRawChannelsClient {
     }
 
     /**
-     * Receives WhatsApp Cloud API message events for the channel. Payload shape is defined by Meta. Signature verification via <code>x-hub-signature-256</code> is used when the channel has an App Secret configured; otherwise the webhook relies on URL secrecy and/or an <code>api_key</code> query parameter.
+     * Receives WhatsApp Cloud API message events for the channel. Payload shape is defined by Meta. An <code>api_key</code> query parameter or <code>x-api-key</code> header is required. Signature verification via <code>x-hub-signature-256</code> is also required when the channel has an App Secret configured.
      */
     public CompletableFuture<AgentClientHttpResponse<Void>> receiveWhatsAppMessage(
             String id, Map<String, Object> body, RequestOptions requestOptions) {
@@ -1325,7 +1324,7 @@ public class AsyncRawChannelsClient {
     }
 
     /**
-     * Receives WhatsApp Cloud API message events for the channel. Payload shape is defined by Meta. Signature verification via <code>x-hub-signature-256</code> is used when the channel has an App Secret configured; otherwise the webhook relies on URL secrecy and/or an <code>api_key</code> query parameter.
+     * Receives WhatsApp Cloud API message events for the channel. Payload shape is defined by Meta. An <code>api_key</code> query parameter or <code>x-api-key</code> header is required. Signature verification via <code>x-hub-signature-256</code> is also required when the channel has an App Secret configured.
      */
     public CompletableFuture<AgentClientHttpResponse<Void>> receiveWhatsAppMessage(
             String id, ReceiveWhatsAppMessageRequest request) {
@@ -1333,7 +1332,7 @@ public class AsyncRawChannelsClient {
     }
 
     /**
-     * Receives WhatsApp Cloud API message events for the channel. Payload shape is defined by Meta. Signature verification via <code>x-hub-signature-256</code> is used when the channel has an App Secret configured; otherwise the webhook relies on URL secrecy and/or an <code>api_key</code> query parameter.
+     * Receives WhatsApp Cloud API message events for the channel. Payload shape is defined by Meta. An <code>api_key</code> query parameter or <code>x-api-key</code> header is required. Signature verification via <code>x-hub-signature-256</code> is also required when the channel has an App Secret configured.
      */
     public CompletableFuture<AgentClientHttpResponse<Void>> receiveWhatsAppMessage(
             String id, ReceiveWhatsAppMessageRequest request, RequestOptions requestOptions) {

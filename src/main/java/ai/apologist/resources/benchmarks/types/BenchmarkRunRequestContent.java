@@ -37,7 +37,8 @@ public final class BenchmarkRunRequestContent {
         if (this.type == 0) {
             return visitor.visitNullableString((Optional<String>) this.value);
         } else if (this.type == 1) {
-            return visitor.visitNullableListOfUnknown((Optional<List<Object>>) this.value);
+            return visitor.visitNullableListOfBenchmarkRunRequestContentOneItem(
+                    (Optional<List<BenchmarkRunRequestContentOneItem>>) this.value);
         }
         throw new IllegalStateException("Failed to visit value. This should never happen.");
     }
@@ -66,14 +67,15 @@ public final class BenchmarkRunRequestContent {
         return new BenchmarkRunRequestContent(value, 0);
     }
 
-    public static BenchmarkRunRequestContent ofNullableListOfUnknown(Optional<List<Object>> value) {
+    public static BenchmarkRunRequestContent ofNullableListOfBenchmarkRunRequestContentOneItem(
+            Optional<List<BenchmarkRunRequestContentOneItem>> value) {
         return new BenchmarkRunRequestContent(value, 1);
     }
 
     public interface Visitor<T> {
         T visitNullableString(Optional<String> value);
 
-        T visitNullableListOfUnknown(Optional<List<Object>> value);
+        T visitNullableListOfBenchmarkRunRequestContentOneItem(Optional<List<BenchmarkRunRequestContentOneItem>> value);
     }
 
     static final class Deserializer extends StdDeserializer<BenchmarkRunRequestContent> {
@@ -90,8 +92,8 @@ public final class BenchmarkRunRequestContent {
             } catch (RuntimeException e) {
             }
             try {
-                return ofNullableListOfUnknown(
-                        ObjectMappers.JSON_MAPPER.convertValue(value, new TypeReference<Optional<List<Object>>>() {}));
+                return ofNullableListOfBenchmarkRunRequestContentOneItem(ObjectMappers.JSON_MAPPER.convertValue(
+                        value, new TypeReference<Optional<List<BenchmarkRunRequestContentOneItem>>>() {}));
             } catch (RuntimeException e) {
             }
             throw new JsonParseException(p, "Failed to deserialize");

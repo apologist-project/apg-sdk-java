@@ -177,28 +177,28 @@ public class RawBenchmarksClient {
     }
 
     /**
-     * Executes a benchmark run and returns the aggregated result with nested evaluators, questions, and a flat evaluations array.
+     * Executes a benchmark run and returns the aggregated result with nested evaluators, questions, and a flat evaluations array. A run that cannot finish inside one request returns 202 with <code>completed_at</code> null and continues in the background. Poll Get a benchmark run until <code>completed_at</code> is set.
      */
     public AgentClientHttpResponse<Map<String, Object>> runBenchmark(String id) {
         return runBenchmark(id, BenchmarkRunRequest.builder().build());
     }
 
     /**
-     * Executes a benchmark run and returns the aggregated result with nested evaluators, questions, and a flat evaluations array.
+     * Executes a benchmark run and returns the aggregated result with nested evaluators, questions, and a flat evaluations array. A run that cannot finish inside one request returns 202 with <code>completed_at</code> null and continues in the background. Poll Get a benchmark run until <code>completed_at</code> is set.
      */
     public AgentClientHttpResponse<Map<String, Object>> runBenchmark(String id, RequestOptions requestOptions) {
         return runBenchmark(id, BenchmarkRunRequest.builder().build(), requestOptions);
     }
 
     /**
-     * Executes a benchmark run and returns the aggregated result with nested evaluators, questions, and a flat evaluations array.
+     * Executes a benchmark run and returns the aggregated result with nested evaluators, questions, and a flat evaluations array. A run that cannot finish inside one request returns 202 with <code>completed_at</code> null and continues in the background. Poll Get a benchmark run until <code>completed_at</code> is set.
      */
     public AgentClientHttpResponse<Map<String, Object>> runBenchmark(String id, BenchmarkRunRequest request) {
         return runBenchmark(id, request, null);
     }
 
     /**
-     * Executes a benchmark run and returns the aggregated result with nested evaluators, questions, and a flat evaluations array.
+     * Executes a benchmark run and returns the aggregated result with nested evaluators, questions, and a flat evaluations array. A run that cannot finish inside one request returns 202 with <code>completed_at</code> null and continues in the background. Poll Get a benchmark run until <code>completed_at</code> is set.
      */
     public AgentClientHttpResponse<Map<String, Object>> runBenchmark(
             String id, BenchmarkRunRequest request, RequestOptions requestOptions) {
