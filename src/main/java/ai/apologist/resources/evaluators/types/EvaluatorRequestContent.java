@@ -36,7 +36,7 @@ public final class EvaluatorRequestContent {
         if (this.type == 0) {
             return visitor.visit((String) this.value);
         } else if (this.type == 1) {
-            return visitor.visit((List<Object>) this.value);
+            return visitor.visit((List<EvaluatorRequestContentOneItem>) this.value);
         }
         throw new IllegalStateException("Failed to visit value. This should never happen.");
     }
@@ -65,14 +65,14 @@ public final class EvaluatorRequestContent {
         return new EvaluatorRequestContent(value, 0);
     }
 
-    public static EvaluatorRequestContent of(List<Object> value) {
+    public static EvaluatorRequestContent of(List<EvaluatorRequestContentOneItem> value) {
         return new EvaluatorRequestContent(value, 1);
     }
 
     public interface Visitor<T> {
         T visit(String value);
 
-        T visit(List<Object> value);
+        T visit(List<EvaluatorRequestContentOneItem> value);
     }
 
     static final class Deserializer extends StdDeserializer<EvaluatorRequestContent> {
@@ -88,7 +88,8 @@ public final class EvaluatorRequestContent {
             } catch (RuntimeException e) {
             }
             try {
-                return of(ObjectMappers.JSON_MAPPER.convertValue(value, new TypeReference<List<Object>>() {}));
+                return of(ObjectMappers.JSON_MAPPER.convertValue(
+                        value, new TypeReference<List<EvaluatorRequestContentOneItem>>() {}));
             } catch (RuntimeException e) {
             }
             throw new JsonParseException(p, "Failed to deserialize");

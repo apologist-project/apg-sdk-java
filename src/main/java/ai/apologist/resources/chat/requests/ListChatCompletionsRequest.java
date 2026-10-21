@@ -6,6 +6,7 @@ package ai.apologist.resources.chat.requests;
 import ai.apologist.core.ObjectMappers;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -20,6 +21,12 @@ import java.util.Optional;
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
 @JsonDeserialize(builder = ListChatCompletionsRequest.Builder.class)
 public final class ListChatCompletionsRequest {
+    private final Optional<String> traceparent;
+
+    private final Optional<String> tracestate;
+
+    private final Optional<String> baggage;
+
     private final Optional<Integer> page;
 
     private final Optional<Integer> perPage;
@@ -59,6 +66,9 @@ public final class ListChatCompletionsRequest {
     private final Map<String, Object> additionalProperties;
 
     private ListChatCompletionsRequest(
+            Optional<String> traceparent,
+            Optional<String> tracestate,
+            Optional<String> baggage,
             Optional<Integer> page,
             Optional<Integer> perPage,
             Optional<String> agentId,
@@ -78,6 +88,9 @@ public final class ListChatCompletionsRequest {
             Optional<String> minTimestamp,
             Optional<String> maxTimestamp,
             Map<String, Object> additionalProperties) {
+        this.traceparent = traceparent;
+        this.tracestate = tracestate;
+        this.baggage = baggage;
         this.page = page;
         this.perPage = perPage;
         this.agentId = agentId;
@@ -97,6 +110,30 @@ public final class ListChatCompletionsRequest {
         this.minTimestamp = minTimestamp;
         this.maxTimestamp = maxTimestamp;
         this.additionalProperties = additionalProperties;
+    }
+
+    /**
+     * @return W3C Trace Context parent. When present, the Agent continues this trace for the request. Applies to all <code>/api/v1</code> endpoints.
+     */
+    @JsonIgnore
+    public Optional<String> getTraceparent() {
+        return traceparent;
+    }
+
+    /**
+     * @return Optional W3C tracestate associated with traceparent.
+     */
+    @JsonIgnore
+    public Optional<String> getTracestate() {
+        return tracestate;
+    }
+
+    /**
+     * @return Optional W3C baggage. Prompt text is never copied onto spans.
+     */
+    @JsonIgnore
+    public Optional<String> getBaggage() {
+        return baggage;
     }
 
     @JsonProperty("page")
@@ -204,7 +241,10 @@ public final class ListChatCompletionsRequest {
     }
 
     private boolean equalTo(ListChatCompletionsRequest other) {
-        return page.equals(other.page)
+        return traceparent.equals(other.traceparent)
+                && tracestate.equals(other.tracestate)
+                && baggage.equals(other.baggage)
+                && page.equals(other.page)
                 && perPage.equals(other.perPage)
                 && agentId.equals(other.agentId)
                 && channelId.equals(other.channelId)
@@ -227,6 +267,9 @@ public final class ListChatCompletionsRequest {
     @java.lang.Override
     public int hashCode() {
         return Objects.hash(
+                this.traceparent,
+                this.tracestate,
+                this.baggage,
                 this.page,
                 this.perPage,
                 this.agentId,
@@ -258,6 +301,12 @@ public final class ListChatCompletionsRequest {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static final class Builder {
+        private Optional<String> traceparent = Optional.empty();
+
+        private Optional<String> tracestate = Optional.empty();
+
+        private Optional<String> baggage = Optional.empty();
+
         private Optional<Integer> page = Optional.empty();
 
         private Optional<Integer> perPage = Optional.empty();
@@ -300,6 +349,9 @@ public final class ListChatCompletionsRequest {
         private Builder() {}
 
         public Builder from(ListChatCompletionsRequest other) {
+            traceparent(other.getTraceparent());
+            tracestate(other.getTracestate());
+            baggage(other.getBaggage());
             page(other.getPage());
             perPage(other.getPerPage());
             agentId(other.getAgentId());
@@ -318,6 +370,45 @@ public final class ListChatCompletionsRequest {
             userId(other.getUserId());
             minTimestamp(other.getMinTimestamp());
             maxTimestamp(other.getMaxTimestamp());
+            return this;
+        }
+
+        /**
+         * <p>W3C Trace Context parent. When present, the Agent continues this trace for the request. Applies to all <code>/api/v1</code> endpoints.</p>
+         */
+        public Builder traceparent(Optional<String> traceparent) {
+            this.traceparent = traceparent;
+            return this;
+        }
+
+        public Builder traceparent(String traceparent) {
+            this.traceparent = Optional.ofNullable(traceparent);
+            return this;
+        }
+
+        /**
+         * <p>Optional W3C tracestate associated with traceparent.</p>
+         */
+        public Builder tracestate(Optional<String> tracestate) {
+            this.tracestate = tracestate;
+            return this;
+        }
+
+        public Builder tracestate(String tracestate) {
+            this.tracestate = Optional.ofNullable(tracestate);
+            return this;
+        }
+
+        /**
+         * <p>Optional W3C baggage. Prompt text is never copied onto spans.</p>
+         */
+        public Builder baggage(Optional<String> baggage) {
+            this.baggage = baggage;
+            return this;
+        }
+
+        public Builder baggage(String baggage) {
+            this.baggage = Optional.ofNullable(baggage);
             return this;
         }
 
@@ -524,6 +615,9 @@ public final class ListChatCompletionsRequest {
 
         public ListChatCompletionsRequest build() {
             return new ListChatCompletionsRequest(
+                    traceparent,
+                    tracestate,
+                    baggage,
                     page,
                     perPage,
                     agentId,

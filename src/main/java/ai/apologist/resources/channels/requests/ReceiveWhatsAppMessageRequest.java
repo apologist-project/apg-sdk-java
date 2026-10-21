@@ -36,7 +36,7 @@ public final class ReceiveWhatsAppMessageRequest {
     }
 
     /**
-     * @return Meta <code>sha256=&lt;hex&gt;</code> HMAC of the raw body keyed with the WhatsApp App Secret. Required when the channel has an App Secret configured and the webhook URL does not include an api_key.
+     * @return Meta <code>sha256=&lt;hex&gt;</code> HMAC of the raw body keyed with the WhatsApp App Secret. Required when the channel has an App Secret configured.
      */
     @JsonIgnore
     public Optional<String> getHubSignature256() {
@@ -98,7 +98,7 @@ public final class ReceiveWhatsAppMessageRequest {
         }
 
         /**
-         * <p>Meta <code>sha256=&lt;hex&gt;</code> HMAC of the raw body keyed with the WhatsApp App Secret. Required when the channel has an App Secret configured and the webhook URL does not include an api_key.</p>
+         * <p>Meta <code>sha256=&lt;hex&gt;</code> HMAC of the raw body keyed with the WhatsApp App Secret. Required when the channel has an App Secret configured.</p>
          */
         public Builder hubSignature256(Optional<String> hubSignature256) {
             this.hubSignature256 = hubSignature256;

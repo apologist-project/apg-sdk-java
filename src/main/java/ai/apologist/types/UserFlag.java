@@ -27,6 +27,8 @@ public final class UserFlag {
 
     private final Optional<String> name;
 
+    private final Optional<String> key;
+
     private final Optional<Integer> userId;
 
     private final Optional<Integer> teamId;
@@ -38,12 +40,14 @@ public final class UserFlag {
     private UserFlag(
             Optional<Integer> id,
             Optional<String> name,
+            Optional<String> key,
             Optional<Integer> userId,
             Optional<Integer> teamId,
             Optional<String> syncedAt,
             Map<String, Object> additionalProperties) {
         this.id = id;
         this.name = name;
+        this.key = key;
         this.userId = userId;
         this.teamId = teamId;
         this.syncedAt = syncedAt;
@@ -58,6 +62,17 @@ public final class UserFlag {
     @JsonProperty("name")
     public Optional<String> getName() {
         return name;
+    }
+
+    /**
+     * @return Optional channel user-attribute key. When null, Agent derives a lowercase snake_case key from name.
+     */
+    @JsonIgnore
+    public Optional<String> getKey() {
+        if (key == null) {
+            return Optional.empty();
+        }
+        return key;
     }
 
     /**
@@ -82,6 +97,12 @@ public final class UserFlag {
     @JsonProperty("synced_at")
     public Optional<String> getSyncedAt() {
         return syncedAt;
+    }
+
+    @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
+    @JsonProperty("key")
+    private Optional<String> _getKey() {
+        return key;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -110,6 +131,7 @@ public final class UserFlag {
     private boolean equalTo(UserFlag other) {
         return id.equals(other.id)
                 && name.equals(other.name)
+                && key.equals(other.key)
                 && userId.equals(other.userId)
                 && teamId.equals(other.teamId)
                 && syncedAt.equals(other.syncedAt);
@@ -117,7 +139,7 @@ public final class UserFlag {
 
     @java.lang.Override
     public int hashCode() {
-        return Objects.hash(this.id, this.name, this.userId, this.teamId, this.syncedAt);
+        return Objects.hash(this.id, this.name, this.key, this.userId, this.teamId, this.syncedAt);
     }
 
     @java.lang.Override
@@ -135,6 +157,8 @@ public final class UserFlag {
 
         private Optional<String> name = Optional.empty();
 
+        private Optional<String> key = Optional.empty();
+
         private Optional<Integer> userId = Optional.empty();
 
         private Optional<Integer> teamId = Optional.empty();
@@ -149,6 +173,7 @@ public final class UserFlag {
         public Builder from(UserFlag other) {
             id(other.getId());
             name(other.getName());
+            key(other.getKey());
             userId(other.getUserId());
             teamId(other.getTeamId());
             syncedAt(other.getSyncedAt());
@@ -174,6 +199,31 @@ public final class UserFlag {
 
         public Builder name(String name) {
             this.name = Optional.ofNullable(name);
+            return this;
+        }
+
+        /**
+         * <p>Optional channel user-attribute key. When null, Agent derives a lowercase snake_case key from name.</p>
+         */
+        @JsonSetter(value = "key", nulls = Nulls.SKIP)
+        public Builder key(Optional<String> key) {
+            this.key = key;
+            return this;
+        }
+
+        public Builder key(String key) {
+            this.key = Optional.ofNullable(key);
+            return this;
+        }
+
+        public Builder key(Nullable<String> key) {
+            if (key.isNull()) {
+                this.key = null;
+            } else if (key.isEmpty()) {
+                this.key = Optional.empty();
+            } else {
+                this.key = Optional.of(key.get());
+            }
             return this;
         }
 
@@ -236,7 +286,7 @@ public final class UserFlag {
         }
 
         public UserFlag build() {
-            return new UserFlag(id, name, userId, teamId, syncedAt, additionalProperties);
+            return new UserFlag(id, name, key, userId, teamId, syncedAt, additionalProperties);
         }
 
         public Builder additionalProperty(String key, Object value) {

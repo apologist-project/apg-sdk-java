@@ -40,9 +40,13 @@ public final class WebhookPayload {
 
     private final Optional<WebhookNamedRef> guardrail;
 
+    private final Optional<WebhookNamedRef> automation;
+
     private final Optional<WebhookNamedRef> evaluator;
 
     private final Optional<WebhookEvaluation> evaluation;
+
+    private final Optional<WebhookPayloadTrace> trace;
 
     private final Map<String, Object> additionalProperties;
 
@@ -55,8 +59,10 @@ public final class WebhookPayload {
             Optional<WebhookNamedRef> platform,
             Optional<WebhookCta> cta,
             Optional<WebhookNamedRef> guardrail,
+            Optional<WebhookNamedRef> automation,
             Optional<WebhookNamedRef> evaluator,
             Optional<WebhookEvaluation> evaluation,
+            Optional<WebhookPayloadTrace> trace,
             Map<String, Object> additionalProperties) {
         this.notification = notification;
         this.event = event;
@@ -66,8 +72,10 @@ public final class WebhookPayload {
         this.platform = platform;
         this.cta = cta;
         this.guardrail = guardrail;
+        this.automation = automation;
         this.evaluator = evaluator;
         this.evaluation = evaluation;
+        this.trace = trace;
         this.additionalProperties = additionalProperties;
     }
 
@@ -130,7 +138,15 @@ public final class WebhookPayload {
     }
 
     /**
-     * @return Present for CTA/guardrail events that ran an evaluation.
+     * @return Present for automation_trigger events.
+     */
+    @JsonProperty("automation")
+    public Optional<WebhookNamedRef> getAutomation() {
+        return automation;
+    }
+
+    /**
+     * @return Present for CTA, guardrail, or automation events that ran an evaluation.
      */
     @JsonProperty("evaluator")
     public Optional<WebhookNamedRef> getEvaluator() {
@@ -140,6 +156,14 @@ public final class WebhookPayload {
     @JsonProperty("evaluation")
     public Optional<WebhookEvaluation> getEvaluation() {
         return evaluation;
+    }
+
+    /**
+     * @return OpenTelemetry context for the API request that produced this event. Present when the Agent created or continued a W3C trace.
+     */
+    @JsonProperty("trace")
+    public Optional<WebhookPayloadTrace> getTrace() {
+        return trace;
     }
 
     @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = NullableNonemptyFilter.class)
@@ -168,8 +192,10 @@ public final class WebhookPayload {
                 && platform.equals(other.platform)
                 && cta.equals(other.cta)
                 && guardrail.equals(other.guardrail)
+                && automation.equals(other.automation)
                 && evaluator.equals(other.evaluator)
-                && evaluation.equals(other.evaluation);
+                && evaluation.equals(other.evaluation)
+                && trace.equals(other.trace);
     }
 
     @java.lang.Override
@@ -183,8 +209,10 @@ public final class WebhookPayload {
                 this.platform,
                 this.cta,
                 this.guardrail,
+                this.automation,
                 this.evaluator,
-                this.evaluation);
+                this.evaluation,
+                this.trace);
     }
 
     @java.lang.Override
@@ -255,7 +283,14 @@ public final class WebhookPayload {
         _FinalStage guardrail(WebhookNamedRef guardrail);
 
         /**
-         * <p>Present for CTA/guardrail events that ran an evaluation.</p>
+         * <p>Present for automation_trigger events.</p>
+         */
+        _FinalStage automation(Optional<WebhookNamedRef> automation);
+
+        _FinalStage automation(WebhookNamedRef automation);
+
+        /**
+         * <p>Present for CTA, guardrail, or automation events that ran an evaluation.</p>
          */
         _FinalStage evaluator(Optional<WebhookNamedRef> evaluator);
 
@@ -264,6 +299,13 @@ public final class WebhookPayload {
         _FinalStage evaluation(Optional<WebhookEvaluation> evaluation);
 
         _FinalStage evaluation(WebhookEvaluation evaluation);
+
+        /**
+         * <p>OpenTelemetry context for the API request that produced this event. Present when the Agent created or continued a W3C trace.</p>
+         */
+        _FinalStage trace(Optional<WebhookPayloadTrace> trace);
+
+        _FinalStage trace(WebhookPayloadTrace trace);
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -274,9 +316,13 @@ public final class WebhookPayload {
 
         private WebhookAgentRef agent;
 
+        private Optional<WebhookPayloadTrace> trace = Optional.empty();
+
         private Optional<WebhookEvaluation> evaluation = Optional.empty();
 
         private Optional<WebhookNamedRef> evaluator = Optional.empty();
+
+        private Optional<WebhookNamedRef> automation = Optional.empty();
 
         private Optional<WebhookNamedRef> guardrail = Optional.empty();
 
@@ -303,8 +349,10 @@ public final class WebhookPayload {
             platform(other.getPlatform());
             cta(other.getCta());
             guardrail(other.getGuardrail());
+            automation(other.getAutomation());
             evaluator(other.getEvaluator());
             evaluation(other.getEvaluation());
+            trace(other.getTrace());
             return this;
         }
 
@@ -329,6 +377,26 @@ public final class WebhookPayload {
             return this;
         }
 
+        /**
+         * <p>OpenTelemetry context for the API request that produced this event. Present when the Agent created or continued a W3C trace.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage trace(WebhookPayloadTrace trace) {
+            this.trace = Optional.ofNullable(trace);
+            return this;
+        }
+
+        /**
+         * <p>OpenTelemetry context for the API request that produced this event. Present when the Agent created or continued a W3C trace.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "trace", nulls = Nulls.SKIP)
+        public _FinalStage trace(Optional<WebhookPayloadTrace> trace) {
+            this.trace = trace;
+            return this;
+        }
+
         @java.lang.Override
         public _FinalStage evaluation(WebhookEvaluation evaluation) {
             this.evaluation = Optional.ofNullable(evaluation);
@@ -343,7 +411,7 @@ public final class WebhookPayload {
         }
 
         /**
-         * <p>Present for CTA/guardrail events that ran an evaluation.</p>
+         * <p>Present for CTA, guardrail, or automation events that ran an evaluation.</p>
          * @return Reference to {@code this} so that method calls can be chained together.
          */
         @java.lang.Override
@@ -353,12 +421,32 @@ public final class WebhookPayload {
         }
 
         /**
-         * <p>Present for CTA/guardrail events that ran an evaluation.</p>
+         * <p>Present for CTA, guardrail, or automation events that ran an evaluation.</p>
          */
         @java.lang.Override
         @JsonSetter(value = "evaluator", nulls = Nulls.SKIP)
         public _FinalStage evaluator(Optional<WebhookNamedRef> evaluator) {
             this.evaluator = evaluator;
+            return this;
+        }
+
+        /**
+         * <p>Present for automation_trigger events.</p>
+         * @return Reference to {@code this} so that method calls can be chained together.
+         */
+        @java.lang.Override
+        public _FinalStage automation(WebhookNamedRef automation) {
+            this.automation = Optional.ofNullable(automation);
+            return this;
+        }
+
+        /**
+         * <p>Present for automation_trigger events.</p>
+         */
+        @java.lang.Override
+        @JsonSetter(value = "automation", nulls = Nulls.SKIP)
+        public _FinalStage automation(Optional<WebhookNamedRef> automation) {
+            this.automation = automation;
             return this;
         }
 
@@ -489,8 +577,10 @@ public final class WebhookPayload {
                     platform,
                     cta,
                     guardrail,
+                    automation,
                     evaluator,
                     evaluation,
+                    trace,
                     additionalProperties);
         }
 

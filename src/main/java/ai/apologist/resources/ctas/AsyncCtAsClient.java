@@ -6,8 +6,8 @@ package ai.apologist.resources.ctas;
 import ai.apologist.core.ClientOptions;
 import ai.apologist.core.RequestOptions;
 import ai.apologist.resources.ctas.requests.CtaClickRequest;
+import ai.apologist.resources.ctas.requests.CtaMatchRequest;
 import ai.apologist.resources.ctas.types.MatchCtasResponse;
-import ai.apologist.types.CtaMatchRequest;
 import ai.apologist.types.SuccessResponse;
 import java.util.concurrent.CompletableFuture;
 
@@ -26,6 +26,20 @@ public class AsyncCtAsClient {
      */
     public AsyncRawCtAsClient withRawResponse() {
         return this.rawClient;
+    }
+
+    /**
+     * Finds matching CTAs based on conversation context, user, session, device, or messages
+     */
+    public CompletableFuture<MatchCtasResponse> matchCtas() {
+        return this.rawClient.matchCtas().thenApply(response -> response.body());
+    }
+
+    /**
+     * Finds matching CTAs based on conversation context, user, session, device, or messages
+     */
+    public CompletableFuture<MatchCtasResponse> matchCtas(RequestOptions requestOptions) {
+        return this.rawClient.matchCtas(requestOptions).thenApply(response -> response.body());
     }
 
     /**
